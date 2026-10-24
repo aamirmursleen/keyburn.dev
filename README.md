@@ -1,186 +1,247 @@
-# One Smart Sheep · Secret
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/banner-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset=".github/assets/banner-light.svg">
+    <img alt="keyburn.dev: secret links that burn after reading" src=".github/assets/banner-dark.svg" width="100%">
+  </picture>
+</p>
 
-Zero-knowledge, self-destructing secret sharing for **secret.onesmartsheep.com**, hosted entirely
-on Cloudflare (Workers, Durable Objects, R2).
+<p align="center">
+  <a href="https://secret.nafran.com"><strong>Live demo</strong></a>
+  &nbsp;·&nbsp;
+  <a href="docs/SECURITY.md"><strong>Security model</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#-for-ai-agents"><strong>For AI agents</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#-run-it-locally"><strong>Run it locally</strong></a>
+</p>
 
-- **Share a secret**: text up to 64 KB and/or a file up to 25 MB, encrypted in the browser.
-  Expiry from 15 minutes to 7 days, 1–10 views, optional passphrase (5 wrong tries destroy it).
-- **Receipts**: the sender gets a private link showing when and from which country it was opened,
-  and can destroy it early.
-- **Request a secret**: send a client a link. What they submit (text and/or file) is encrypted to
-  your private inbox link, so only you can open it.
+<p align="center">
+  <a href="https://github.com/aamirmursleen/keyburn.dev/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/aamirmursleen/keyburn.dev/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="Runtime dependencies: 0" src="https://img.shields.io/badge/runtime%20dependencies-0-2D6AD3">
+  <img alt="AES-256-GCM in your browser" src="https://img.shields.io/badge/AES--256--GCM-in%20your%20browser-FF7A1A">
+  <img alt="Cloudflare Workers, Durable Objects and R2" src="https://img.shields.io/badge/Cloudflare-Workers%20·%20Durable%20Objects%20·%20R2-F38020?logo=cloudflare&logoColor=white">
+  <img alt="MCP server for AI agents" src="https://img.shields.io/badge/MCP-for%20AI%20agents-0C1B3F">
+  <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
+</p>
 
-How it protects data is described in [docs/SECURITY.md](docs/SECURITY.md); there is a
-plain-language version for clients at `/security`.
+---
 
-## Architecture
+Passwords, API keys and `.env` files end up in chats, tickets and inboxes, where they stay forever.
+**keyburn** sends them as a link that works once and then burns:
 
+1. **Your browser encrypts it.** AES-256-GCM with the browser's own Web Crypto. Nothing readable leaves your device.
+2. **You share the link.** The key is the part after `#`, which browsers never send to any server.
+3. **It burns.** After its last view (1 to 10) or when its timer runs out (15 minutes to 7 days), it's deleted for good.
+
+The server only ever stores encrypted data and hashes of one-time tokens. It never receives the key,
+so it can't read what you share. And with the `osss` tool, **AI agents like Claude Code can use a
+secret without ever seeing it.**
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/screenshot-dark.png">
+    <img alt="The keyburn web app: share a secret" src=".github/assets/screenshot-light.png" width="92%">
+  </picture>
+</p>
+
+## ✦ Features
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🔐 Encrypted before it leaves you</h3>
+      Text up to 64 KB and one file up to 25 MB, sealed with AES-256-GCM in your browser.
+      Sizes are padded, so even the stored size gives little away.
+    </td>
+    <td width="50%" valign="top">
+      <h3>🔥 Burns after reading</h3>
+      One to ten views, fifteen minutes to seven days. Each secret lives in its own strongly
+      consistent Durable Object, so a one-time link opens exactly once, even under a race.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>🗝️ A real second lock</h3>
+      An optional passphrase is mixed into the key (PBKDF2-SHA256, 600,000 rounds) and never sent.
+      Five wrong tries destroy the secret.
+    </td>
+    <td valign="top">
+      <h3>🧾 A private receipt</h3>
+      The sender sees when the secret was opened and from which country, and can burn it early.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>📥 Request a secret</h3>
+      Send someone a request link. They answer once, encrypted to your key (ECDH P-256), and only
+      your private inbox link can open it.
+    </td>
+    <td valign="top">
+      <h3>🤖 Built for AI agents</h3>
+      A CLI, an MCP server and a Claude Code hook let agents open links on your machine and use
+      secrets without the value ever entering the conversation.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>🛡️ Nothing to track you with</h3>
+      No accounts, cookies, analytics or third-party scripts. A Content Security Policy pinned to
+      the app's own files, with Trusted Types, keeps injected code from running.
+    </td>
+    <td valign="top">
+      <h3>⚡ On Cloudflare's edge</h3>
+      One Worker, Durable Objects and R2. Zero runtime dependencies: every line of crypto is the
+      platform's Web Crypto.
+    </td>
+  </tr>
+</table>
+
+## 🔎 How it works
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant S as Sender's browser
+    participant K as keyburn (Cloudflare Worker)
+    participant R as Recipient's browser
+    S->>S: Make a random key S. Derive the id, tokens and AES-256-GCM keys (HKDF)
+    S->>K: Ciphertext + SHA-256 hashes of the tokens (never S)
+    K-->>S: Stored in the secret's own Durable Object
+    S-->>R: https://…/s#S  (the part after # never leaves a browser)
+    R->>K: Token derived from S
+    K-->>R: Ciphertext. One view used; the last view deletes it
+    R->>R: Decrypt locally
 ```
-Browser (WebCrypto: AES-256-GCM, HKDF, PBKDF2, ECDH P-256)
-   │  ciphertext + token hashes only — keys stay in the URL #fragment
-   ▼
-Cloudflare Worker  (src/worker)  — strict headers, validation, rate limits, routing
-   ├── Vault Durable Object (one per secret/request)  — atomic one-time state, alarms
-   ├── Quota Durable Object (per client/day + global) — strict daily budgets
-   ├── R2 bucket "osss-secret-files"                  — encrypted file attachments
-   └── Static assets (public/)                        — HTML/CSS + bundled client JS
-```
 
-| Path | Page |
+| The server stores | The server never sees |
 | --- | --- |
-| `/` | Share a secret |
-| `/s#…` | Open a secret (recipient) |
-| `/m#…` | Sender's receipt / destroy |
-| `/request` | Create a request link |
-| `/r#…` | Client submits a secret |
-| `/i#…` | Requester's private inbox |
-| `/security` | How it works |
-| `/agents` | The `osss` CLI and MCP server for AI agents |
+| Ciphertext and its padded size | The key in the link, or the link itself |
+| Creation, expiry and view times | Your text, files or file names |
+| The country each view came from (for the receipt) | Your passphrase |
+| SHA-256 hashes of one-time tokens | Request private keys |
 
-For agents and crawlers there are also `/robots.txt` (with Content Signals), `/sitemap.xml`,
-`/llms.txt`, `/auth.md`, `/openapi.json`, `/api/v1/health`, `/.well-known/api-catalog`
-(RFC 9727), `/.well-known/ai-catalog.json` (ARD), `/.well-known/agent-skills/index.json` and
-Markdown versions of the public pages (`Accept: text/markdown`, or `/index.md`, `/agents.md`, …).
+The full protocol, threat model and limits are in **[docs/SECURITY.md](docs/SECURITY.md)**.
 
-## AI agents: the `osss` CLI and MCP server
+## 🤖 For AI agents
 
-`src/cli` is a zero-dependency Node 22+ tool, bundled by `scripts/build.mjs` into
-`public/cli/osss-<version>.mjs` and served at `/cli/`. It lets Claude Code, Codex and other agents
-open secret links on the user's computer without the value entering the conversation: opened
-secrets are stored encrypted in `~/.osss` (the key exists only in the handle the agent gets), and
-`osss run <handle> -- <command>` passes them to one command as environment variables, with output
-redaction. Passphrases are only ever typed at a terminal. Design and limits:
-[docs/SECURITY.md](docs/SECURITY.md#ai-agents-osss).
+Paste a secret link into Claude Code, Codex or any MCP client, and the agent can **use** the secret
+without **seeing** it. `osss` opens the link on your computer, keeps it encrypted in `~/.osss`, and
+hands the agent a handle instead of the value:
 
-Install (the fingerprint is checked by the build against `src/cli/release.json`):
+```console
+$ osss open https://secret.nafran.com/s#…
+Opened. The secret is stored encrypted on this machine and was not shown.
+Handle: osss_Lq3…_v9X…
+Contains: 1 environment variable(s): CLOUDFLARE_API_TOKEN
+The secret is now deleted from the server.
+
+$ osss run osss_Lq3…_v9X… -- npx wrangler deploy
+```
+
+- **Handles, not values.** MCP results contain a handle and variable names only. The local copy is
+  encrypted with a key that exists only inside the handle.
+- **Use without seeing.** `osss run` passes the secret to one command as environment variables, and
+  redacts it from the output. Names that could hijack a program (`PATH`, `NODE_OPTIONS`,
+  `LD_PRELOAD`, proxies, certificate and endpoint overrides) are never exported.
+- **Links kept out of the chat.** As a Claude Code `UserPromptSubmit` hook, `osss hook claude-code`
+  catches a pasted link, opens it locally and stops the message before it reaches the model, then
+  gives you the message back with a handle in place of the link.
+- **Pinned and self-contained.** One zero-dependency file for Node.js 22+, pinned by SHA-256. It
+  talks only to the keyburn servers, never follows redirects, refuses compressed responses and
+  checks every reply.
+
+Install it and connect Claude Code (the fingerprint is pinned by the build in `src/cli/release.json`):
 
 ```sh
 (umask 077 && mkdir -p ~/.osss && cd ~/.osss && rm -f osss.download \
-  && curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.0.mjs \
-  && echo "e4eba54de32d6b275ea96919b389a58cca8fc4431112ee84b2ad5ca8fdeb7d27  osss.download" | shasum -a 256 -c \
+  && curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.1.mjs \
+  && echo "a70edb2257f680ec7a9265aa4f0f60532dad82267cabdefd38836c702ded7087  osss.download" | shasum -a 256 -c \
   && mv osss.download osss.mjs)
 claude mcp add --scope user osss -- node ~/.osss/osss.mjs mcp
 ```
 
-Optionally, `osss hook claude-code` as a Claude Code `UserPromptSubmit` hook keeps pasted links
-out of the conversation entirely: it opens them locally, blocks the message before it reaches the
-model, and hands the user the message back with handles in place of the links (see `/agents`).
+More, including Codex and the hook: **[/agents](https://secret.nafran.com/agents)**. Browser agents
+get a WebMCP tool to create links, and crawlers and agents find the site through `llms.txt`, an
+API catalog (RFC 9727), an OpenAPI description, an agent skill and Markdown versions of every
+public page (`Accept: text/markdown`).
 
-Releases are pinned: once a version's SHA-256 is recorded in `src/cli/release.json`, changing the
-CLI without bumping `src/cli/version.ts` fails the deploy build (`--verify-release`). To release,
-bump the version and run `node scripts/build.mjs --release`, which records the hash and updates
-the install snippets in this file, `public/agents.html`, `public/md/agents.md` and the agent
-skill. Local dev servers (`npm run dev`, the e2e runs) set `OSSS_DEV=1` and only warn.
+## 🏗️ Architecture
 
-## Development
-
-Requires Node 22+ and npm ≥ 11.19 (enforced by `engine-strict`). Installs fail if any dependency
-has install scripts other than the reviewed ones in `package.json` → `allowScripts` (esbuild,
-workerd), because `.npmrc` sets `strict-allow-scripts`. npm 11.19 doesn't apply that check to
-`npm audit fix` or `npm dedupe`, so run those with `--ignore-scripts` and then run `npm install`.
-
-```bash
-npm install
-npm run dev            # builds the client, runs wrangler dev on http://localhost:8787
-npm test               # Worker/Durable Object/crypto tests in workerd, then the CLI tests in Node
-npm run test:coverage  # coverage reports (thresholds: 80% lines/functions/statements)
-npm run typecheck      # client, worker, CLI and tests
-npm run build && npm run e2e   # Playwright end-to-end runs (browser, then CLI and MCP), with leak checks
+```mermaid
+flowchart LR
+    B["Browser<br/>Web Crypto"] -- "ciphertext + token hashes" --> W
+    C["osss CLI / MCP<br/>on your machine"] -- "ciphertext + token hashes" --> W
+    W["Cloudflare Worker<br/>strict CSP · validation · rate limits"] --> V[("Vault Durable Object<br/>one per secret")]
+    W --> Q[("Quota Durable Object<br/>daily budgets")]
+    W --> F[("R2<br/>encrypted files")]
 ```
 
-`npm run dev` needs a `.dev.vars` file containing `IP_HASH_SECRET=<random string>` (gitignored).
+## 🛡️ Security engineering
 
-## Current deployment
+- **Zero-knowledge protocol (`osss/v1`).** Keys derived with HKDF from a 256-bit link key; record ids
+  bound to a token hash, so nobody can claim or probe an id; tokens stored only as hashes; unknown
+  ids and wrong tokens look identical.
+- **Hardened pages.** CSP pinned to exact files (no `'self'`), Trusted Types, COOP/COEP/CORP,
+  `no-transform` so nothing upstream can inject scripts, no cookies and `no-referrer`.
+- **Strict state.** One Durable Object per secret: atomic views, exact alarms, permanent burn markers,
+  downloads cut off mid-stream when a secret is destroyed.
+- **Abuse limits.** Per-IP rate limits, plus daily quotas per IP, per IPv6 /48 and globally.
+- **Supply chain.** Zero runtime dependencies, exact version pins, `strict-allow-scripts`, Actions
+  pinned by commit, and CLI releases pinned by SHA-256.
+- **Reviewed.** An automated security audit and several AI-assisted code and security reviews, with
+  every finding fixed. There has been no third-party audit yet.
 
-- **Live at https://secrets.nafran.com and https://secret.nafran.com** (both custom domains on
-  the same Worker; links point to whichever host they were created on): Worker `osss-secret` in the Cloudflare
-  account that owns nafran.com, R2 bucket `osss-secret-files` (9-day safety-net lifecycle rule), secret
-  `IP_HASH_SECRET` set.
-- Redeploy after changes with `npm run deploy` (type checks, tests, build and the browser test
-  run first). Smoke-test production with
-  `E2E_BASE=https://secret.nafran.com npm run e2e`.
-- Pages are served with `Cache-Control: no-store, no-transform`, so Cloudflare zone features
-  (Web Analytics auto-injection, Email Obfuscation, Rocket Loader) can't inject scripts. The
-  nafran.com zone has Web Analytics injection on, and this is what keeps it out.
-- The nafran.com zone has the "Add security headers" Managed Transform on, which downgrades
-  `X-Frame-Options` to `SAMEORIGIN` and `Referrer-Policy` to `same-origin` on responses.
-  Framing is still blocked by CSP `frame-ancestors 'none'`, and pages and requests set
-  `no-referrer` themselves. To restore the exact headers, turn that transform off for the zone.
+## ✅ Quality
 
-### Moving to secret.onesmartsheep.com later
+- Worker, Durable Object and crypto tests run in the real `workerd` runtime; the agent tool is tested
+  in Node; coverage thresholds are enforced.
+- Playwright end-to-end runs walk every flow (share, open, passphrase, files, receipts, requests,
+  inbox, CLI, MCP, hook, WebMCP) and fail if a key, passphrase or plaintext is ever sent to the
+  server.
+- [CI](https://github.com/aamirmursleen/keyburn.dev/actions/workflows/ci.yml) runs it all on every push.
 
-The `onesmartsheep.com` zone lives in a different Cloudflare account. R2 must first be enabled there
-(dashboard → R2 Object Storage). Then set `CLOUDFLARE_ACCOUNT_ID` in `.env` and the route in `wrangler.jsonc` and
-follow the steps below.
+## 🚀 Run it locally
 
-## Deployment
+```bash
+git clone https://github.com/aamirmursleen/keyburn.dev && cd keyburn.dev
+npm install                       # Node.js 24.22+ (npm 11.19+)
+echo "IP_HASH_SECRET=$(openssl rand -hex 32)" > .dev.vars
+npm run dev                       # http://localhost:8787
+npm test                          # workerd + Node test suites
+npm run build && npm run e2e      # Playwright end to end
+```
 
-The Worker must be deployed into the Cloudflare account that owns the target zone.
+Deployment, configuration and limits: **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
 
-1. Log in with an account that has access to that zone (`npx wrangler whoami` should list it). If
-   the login can see several accounts, put `CLOUDFLARE_ACCOUNT_ID=<id>` in a `.env` file (gitignored).
-2. Create the R2 bucket and a safety-net lifecycle rule (normal deletion is immediate; this only
-   catches orphans):
-   ```bash
-   npx wrangler r2 bucket create osss-secret-files
-   npx wrangler r2 bucket lifecycle add osss-secret-files purge-orphans --expire-days 9 --force
-   ```
-3. Set the HMAC key used to pseudonymize client IPs for rate limiting:
-   ```bash
-   openssl rand -base64 32 | npx wrangler secret put IP_HASH_SECRET
-   ```
-4. Deploy (runs type checks, tests with coverage, the build and the browser end-to-end test first):
-   ```bash
-   npm run deploy
-   ```
-   This creates the `secret.onesmartsheep.com` custom domain, DNS record and certificate automatically.
-5. In the Cloudflare dashboard for `onesmartsheep.com`, make sure nothing injects scripts into
-   this hostname: **Rocket Loader off, Email Address Obfuscation off, Web Analytics automatic
-   setup off (or excluded for this hostname), no Zaraz.** The CSP (pinned to the app's own
-   files) blocks injected scripts anyway, but they would produce errors. Keep **Always Use
-   HTTPS** on.
-6. Smoke test: create a secret, open it in a private window, check the receipt.
+## 🗂️ Project layout
 
-## Configuration
+```
+src/
+  shared/    protocol, crypto (AES-256-GCM, HKDF, PBKDF2, ECDH) and encoding, used everywhere
+  worker/    the Cloudflare Worker: routing, headers, validation, Vault and Quota Durable Objects
+  client/    the browser app (one bundle, no framework)
+  cli/       osss: CLI, MCP server and Claude Code hook for AI agents
+public/      pages, styles, fonts and the agent discovery files
+test/        workerd and Node test suites
+e2e/         Playwright end-to-end runs
+docs/        SECURITY.md (design and limits), DEPLOYMENT.md
+```
 
-Limits live in `wrangler.jsonc` (`vars`) and `src/shared/protocol.ts` (`LIMITS`):
+## 🧭 Roadmap
 
-| Setting | Default |
-| --- | --- |
-| Creations per client per minute | 10 (`RL_CREATE`) |
-| Reads per client per minute | 60 (`RL_ACCESS`) |
-| Uploads per client per minute | 10 (`RL_UPLOAD`) |
-| Creations per client per day | 100 (`QUOTA_IP_CREATES_PER_DAY`) |
-| Upload bytes per client per day | 1 GB (`QUOTA_IP_BYTES_PER_DAY`) |
-| Creations per IPv6 /48 per day | 400 (`QUOTA_NET_CREATES_PER_DAY`) |
-| Upload bytes per IPv6 /48 per day | 2 GB (`QUOTA_NET_BYTES_PER_DAY`) |
-| Creations per day, all clients | 50,000 (`QUOTA_GLOBAL_CREATES_PER_DAY`) |
-| Upload bytes per day, all clients | 100 GB (`QUOTA_GLOBAL_BYTES_PER_DAY`) |
-| Text / file size | 64 KB / 25 MB |
-| Receipt retention | 30 days |
+- Retry-safe opens, so a lost response can never burn a one-view secret
+- Signed `osss` releases with an offline key
+- EU-only storage option (Durable Object jurisdiction and an EU R2 bucket)
 
-Rate-limit `namespace_id`s (71001–71003) must be unique within the Cloudflare account.
+## 🔒 Reporting a vulnerability
 
-## Decisions worth knowing
+Please use **[private vulnerability reporting](https://github.com/aamirmursleen/keyburn.dev/security/advisories/new)**,
+not public issues. See [SECURITY.md](.github/SECURITY.md).
 
-- **Zero runtime dependencies.** Validation is hand-written (`src/worker/validate.ts`) instead of
-  using Zod, to keep third-party code out of a security-critical service. All crypto is native
-  WebCrypto.
-- **Creation is public** (no login), as requested. Abuse is bounded by rate limits, daily quotas
-  and wording that never presents content as coming from One Smart Sheep. To restrict creation to
-  the team later, put Cloudflare Access (Google login for @onesmartsheep.com) in front of `/`,
-  `/request` and `/api/v1/*/create`.
-- **Durable Objects, not KV**, because one-time secrets need strong consistency.
+## License
 
-## Follow-ups
+No license has been chosen yet, so all rights are reserved for now: you can read and audit the code,
+but not reuse it.
 
-- Add `public/.well-known/security.txt` with a security contact address.
-- Not offered on purpose: an MCP Server Card (the format describes remote MCP servers, and a
-  remote server that handled links would see their keys), OAuth discovery and protected-resource
-  metadata (there is no OAuth: links are the capability, see `/auth.md`), and DNS-AID records.
-- HSTS preload would have to be enabled on the apex `onesmartsheep.com` (it then covers every
-  subdomain), so it's a whole-domain decision. Only do it once every subdomain is HTTPS-only.
-- Optional: keep data in the EU by using a Durable Object jurisdiction
-  (`env.VAULT.jurisdiction("eu")`) and an EU R2 bucket.
-- Protect the Cloudflare account with hardware-key 2FA. Whoever can deploy this Worker could
-  change the code that runs in visitors' browsers.
+<p align="center"><sub>Designed and built for One Smart Sheep.</sub></p>

@@ -1,0 +1,29 @@
+name: Bug report
+description: Something doesn't work as described.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Never paste a real secret link, receipt, request or inbox link here: they are keys."
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options: [Web app, osss CLI, osss MCP server, Claude Code hook, Worker / API, Docs]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. ...\n2. ..."
+  - type: input
+    id: env
+    attributes:
+      label: Browser / OS / Node.js version

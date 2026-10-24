@@ -60,6 +60,8 @@ const DISCOVERY_LINKS = [
 
 const ROOT_FILES = new Set(["/favicon.svg", "/.well-known/security.txt"]);
 const ASSET = /^\/assets\/[a-z0-9-]+\.(?:js|css|svg)$/;
+/** Self-hosted web fonts (Poppins, JetBrains Mono; SIL Open Font License). */
+const FONT = /^\/assets\/fonts\/[a-z0-9-]+\.woff2$/;
 /** The agent tool: versioned files only (each pinned by its SHA-256), and SHA256SUMS. */
 const CLI_FILE = /^\/cli\/(?:osss-\d{1,3}\.\d{1,3}\.\d{1,3}\.mjs|SHA256SUMS)$/;
 
@@ -116,6 +118,11 @@ async function serveStatic(request: Request, env: Env, url: URL): Promise<Respon
     // Served as plain text so a browser never runs it; people save it and run it with Node.
     if (file.status === 200 || file.status === 304) return harden(withType(file, "text/plain; charset=utf-8"), "asset", url);
     await file.body?.cancel();
+  }
+  if (FONT.test(url.pathname)) {
+    const font = await fetchAsset(env, url.pathname, request, true);
+    if (font.status === 200 || font.status === 304) return harden(withType(font, "font/woff2"), "asset", url);
+    await font.body?.cancel();
   }
   if (ASSET.test(url.pathname) || ROOT_FILES.has(url.pathname)) {
     const asset = await fetchAsset(env, url.pathname, request, true);

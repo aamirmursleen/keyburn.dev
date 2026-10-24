@@ -8,7 +8,7 @@
 // `--verify-release` (wrangler's build command, so every deploy) fails instead of warning
 // when they differ, except for local dev servers started with OSSS_DEV=1.
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { build } from "esbuild";
 
 await build({
@@ -44,8 +44,10 @@ await build({
   tsconfig: "tsconfig.cli.json",
   logLevel: "info",
 });
-// Only versioned files are published; remove any unversioned copy left by older builds.
-await rm("public/cli/osss.mjs", { force: true });
+// Only the current version is published; remove other builds (and any unversioned copy).
+for (const name of await readdir("public/cli")) {
+  if (name.endsWith(".mjs") && name !== `osss-${version}.mjs`) await rm(`public/cli/${name}`, { force: true });
+}
 const sha256 = createHash("sha256").update(await readFile(outfile)).digest("hex");
 
 // Pages that tell people what to download and which fingerprint to expect.

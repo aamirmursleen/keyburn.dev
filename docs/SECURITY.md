@@ -162,7 +162,10 @@ it never reaches the AI provider's servers or chat history.
   from code on the user's disk that is pinned by SHA-256 (`src/cli/release.json`). Unlike the web
   pages, a compromised server can't change the code that handles the key. It only talks to
   `secret.nafran.com` and `secrets.nafran.com` (plus a loopback test server via `OSSS_ORIGIN`),
-  never follows redirects, caps and strictly validates every response.
+  never follows redirects, caps and strictly validates every response. It doesn't use Node's
+  `fetch()`: its own transport asks for uncompressed data, refuses compressed responses without
+  decompressing them (so server bytes never reach zlib's decoders, as in CVE-2026-111497) and
+  opens a new connection per request (no keep-alive reuse, as in CVE-2026-105481).
 - **Handles, not values.** An opened secret is encrypted with a fresh AES-256-GCM key and written
   to `~/.osss/vault/<id>.<expiry>.bin` (directories 0700, files 0600, exclusive create, never
   following links; the AAD binds the id and expiry). The key exists only in the handle

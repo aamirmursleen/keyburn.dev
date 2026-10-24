@@ -65,6 +65,7 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       // Pinned to the app's own files: other same-origin paths (e.g. /cdn-cgi/) are not allowed.
       expect(csp).toContain("script-src https://secret.onesmartsheep.com/assets/app.js;");
       expect(csp).toContain("connect-src https://secret.onesmartsheep.com/api/v1/;");
+      expect(csp).toContain("font-src https://secret.onesmartsheep.com/assets/fonts/;");
       expect(csp).not.toContain("'self'");
       expect(csp).toContain("require-trusted-types-for 'script'");
       expect(csp).not.toContain("unsafe-inline");
@@ -154,6 +155,14 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
     await res.arrayBuffer();
   });
 
+  it("serves the self-hosted fonts as woff2", async () => {
+    const res = await fetchPage("https://secret.onesmartsheep.com/assets/fonts/poppins-400-latin.woff2");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toBe("font/woff2");
+    expectHardened(res.headers);
+    expect(new Uint8Array(await res.arrayBuffer()).slice(0, 4)).toEqual(new TextEncoder().encode("wOF2"));
+  });
+
   it("serves the agent tool as plain text that browsers won't run", async () => {
     const sumsFile = await fetchPage("https://secret.onesmartsheep.com/cli/SHA256SUMS");
     const [, release] = (await sumsFile.text()).trim().split(/\s+/);
@@ -188,6 +197,10 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       "/cli/%2e%2e/index.html",
       "/cli/../src/cli/main.ts",
       "/md/index.md",
+      "/assets/fonts/OFL-Poppins.txt",
+      "/assets/fonts/missing.woff2",
+      "/assets/fonts/%2e%2e/%2e%2e/wrangler.jsonc",
+      "/assets/fonts/poppins-400-latin.woff2.map",
       "/s.md",
       "/m.md",
       "/.well-known/api-catalog.json",

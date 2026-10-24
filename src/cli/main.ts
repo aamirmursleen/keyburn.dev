@@ -14,6 +14,7 @@ import { planHook } from "./hook";
 import { Api } from "./http";
 import { DEFAULT_ORIGINS, parseReceiptLink, parseSecretLink, trustedOrigins } from "./links";
 import { serveMcp, type OpenSummary } from "./mcp";
+import { plainFetch } from "./transport";
 import { runWithSecret } from "./run";
 import {
   DEFAULT_TTL_MS,
@@ -151,7 +152,7 @@ interface Context {
 
 async function openToHandle(ctx: Context, linkText: string, allowPrompt: boolean): Promise<OpenSummary> {
   const link = parseSecretLink(linkText, ctx.origins);
-  const api = new Api(link.origin);
+  const api = new Api(link.origin, plainFetch);
   // Fail before using up a view if the secret couldn't be stored afterwards.
   await ensureVault(ctx.home);
   let opened;
@@ -358,7 +359,7 @@ async function main(argv: string[]): Promise<number> {
       const passphrase = typed ? await promptHidden("Passphrase for the recipient: ") : args.flags.has("--passphrase");
       if (typeof passphrase === "string" && passphrase.length < 8) throw new CliError("usage", "Use a passphrase of at least 8 characters.");
       const origin = ctx.origins.length > DEFAULT_ORIGINS.length ? (ctx.origins[ctx.origins.length - 1] as string) : (DEFAULT_ORIGINS[0] as string);
-      const shared = await shareSecret(new Api(origin), {
+      const shared = await shareSecret(new Api(origin, plainFetch), {
         text,
         file: attach ? { name: basename(attachPath as string), type: "application/octet-stream", data: attach } : null,
         views: views as (typeof VIEW_CHOICES)[number],
@@ -380,7 +381,7 @@ async function main(argv: string[]): Promise<number> {
     case "status":
     case "revoke": {
       const receipt = parseReceiptLink(await linkArg(args.positionals[0], "receipt link"), ctx.origins);
-      const api = new Api(receipt.origin);
+      const api = new Api(receipt.origin, plainFetch);
       printReceipt(args.command === "status" ? await secretStatus(api, receipt) : await revokeSecret(api, receipt), json);
       return 0;
     }

@@ -28,8 +28,8 @@ Tell the user; don't install it without their approval. Setup (Node.js 22 or new
 
 ```sh
 (umask 077 && mkdir -p ~/.osss && cd ~/.osss && rm -f osss.download \
-  && curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.0.mjs \
-  && echo "e4eba54de32d6b275ea96919b389a58cca8fc4431112ee84b2ad5ca8fdeb7d27  osss.download" | shasum -a 256 -c \
+  && curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.1.mjs \
+  && echo "a70edb2257f680ec7a9265aa4f0f60532dad82267cabdefd38836c702ded7087  osss.download" | shasum -a 256 -c \
   && mv osss.download osss.mjs)
 claude mcp add --scope user osss -- node ~/.osss/osss.mjs mcp
 ```

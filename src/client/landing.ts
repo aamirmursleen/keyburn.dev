@@ -1,69 +1,20 @@
-// Progressive enhancements for the homepage: scroll reveals, loops that only run while on
-// screen, the sticky title bar, the FAQ accordion, live hints next to the form options and
-// the footer's local-time line.
+// Progressive enhancements for the homepage: the FAQ accordion, "create a secret" links that
+// put the cursor in the form, live hints next to the form options and the hero's countdown.
+// (Shared chrome, scroll reveals and loops live in shell.ts and motion.ts.)
 //
 // The page is complete without this file: content is visible and readable, the accordion
-// is open and the form works. Everything here only adds classes, ARIA state, textContent
-// and CSS custom properties (CSSOM), so it runs under the strict CSP and Trusted Types
-// 'none'. It never reads, stores or sends the secret or the created links; for the
-// passphrase it only checks whether the field is empty (to show "On"/"Off").
+// is open and the form works. Everything here only adds classes, ARIA state and textContent,
+// so it runs under the strict CSP and Trusted Types 'none'. It never reads, stores or sends
+// the secret or the created links; for the passphrase it only checks how long it is (to show
+// "On", "Off" or "Too short").
+
+import { prefersReducedMotion } from "./motion";
 
 /** A refresh that re-renders time-dependent text. */
 type Task = () => void;
 
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-
 function el<T extends HTMLElement = HTMLElement>(id: string): T | null {
   return document.getElementById(id) as T | null;
-}
-
-function onScreen(
-  targets: Iterable<Element>,
-  callback: (entry: IntersectionObserverEntry, observer: IntersectionObserver) => void,
-  options: IntersectionObserverInit,
-): void {
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) callback(entry, observer);
-  }, options);
-  for (const target of targets) observer.observe(target);
-}
-
-/** Fades sections in as they scroll into view. Hiding is gated on the `js` class in CSS. */
-function revealOnScroll(): void {
-  onScreen(
-    document.querySelectorAll("[data-reveal]"),
-    (entry, observer) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-in");
-      observer.unobserve(entry.target);
-    },
-    { rootMargin: "0px 0px -6% 0px", threshold: 0.06 },
-  );
-}
-
-/** Loops run only while visible, restarting from frame 0 each time they come back. */
-function playLoopsOnScreen(): void {
-  onScreen(
-    document.querySelectorAll(".loop"),
-    (entry) => entry.target.classList.toggle("is-playing", entry.isIntersecting),
-    { threshold: 0.1 },
-  );
-}
-
-/** Gives the title bar its floating glass state once it sticks to the top. */
-function stickyBar(): void {
-  const bar = document.querySelector<HTMLElement>(".win-bar");
-  const sentinel = el("bar-sentinel");
-  if (!bar || !sentinel) return;
-  onScreen(
-    [sentinel],
-    (entry) => {
-      const stuck = !entry.isIntersecting && entry.boundingClientRect.top < 0 && getComputedStyle(bar).position === "sticky";
-      bar.classList.toggle("is-stuck", stuck);
-    },
-    { threshold: 0 },
-  );
 }
 
 /**
@@ -94,22 +45,25 @@ function accordion(): void {
 function focusFormLinks(): void {
   const compose = el("compose");
   const created = el("created");
+  const target = (): { section: HTMLElement | null; field: HTMLElement | null } => {
+    // After a link was created the form is hidden: go to the result instead of clearing it.
+    const showingResult = compose?.hidden === true;
+    return { section: showingResult ? created : compose, field: el(showingResult ? "copy-secret-link" : "secret") };
+  };
   document.querySelectorAll<HTMLAnchorElement>("a[data-focus-form]").forEach((link) => {
     link.addEventListener("click", (event) => {
-      // After a link was created the form is hidden: go to the result instead of clearing it.
-      const showingResult = compose?.hidden === true;
-      const section = showingResult ? created : compose;
-      const target = el(showingResult ? "copy-secret-link" : "secret");
-      if (!section || !target) return;
+      const { section, field } = target();
+      if (!section || !field) return;
       event.preventDefault();
-      section.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "start" });
-      target.focus({ preventScroll: true });
+      section.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+      field.focus({ preventScroll: true });
     });
   });
+  // Arriving from "New secret" on another page (/#compose): the browser scrolls, we focus.
+  if (location.hash === "#compose") target().field?.focus({ preventScroll: true });
 }
 
 const timeFormat = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
-const weekdayFormat = new Intl.DateTimeFormat(undefined, { weekday: "long" });
 const shortWeekdayFormat = new Intl.DateTimeFormat(undefined, { weekday: "short" });
 const dateFormat = new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" });
 
@@ -127,7 +81,7 @@ function describeMoment(at: Date, now: Date): string {
   return `${dateFormat.format(at)}, ${time}`;
 }
 
-/** Live hints beside the options: when it would expire if sent now, views, passphrase on/off. */
+/** Live hints beside the options: when it would expire if sent now, views, passphrase state. */
 function liveHints(): Task {
   const expires = el<HTMLSelectElement>("expires");
   const views = el<HTMLSelectElement>("views");
@@ -143,9 +97,12 @@ function liveHints(): Task {
     expiresOut.textContent = `Expires ${describeMoment(new Date(now.getTime() + Number(expires.value) * 1000), now)}`;
     const count = Number(views.value);
     viewsOut.textContent = count === 1 ? "Deleted after 1 view" : `Deleted after ${count} views`;
-    const on = passphrase.value.length > 0;
-    passOut.textContent = on ? "On" : "Off";
-    passState.classList.toggle("is-on", on);
+    // The form refuses passphrases shorter than 8 characters, so say so before sending.
+    const length = passphrase.value.length;
+    const state = length === 0 ? "off" : length < 8 ? "short" : "on";
+    passOut.textContent = state === "off" ? "Off" : state === "short" ? "Too short (8+ characters)" : "On";
+    passState.classList.toggle("is-on", state === "on");
+    passState.classList.toggle("is-short", state === "short");
   };
 
   for (const field of [expires, views, passphrase]) {
@@ -160,23 +117,6 @@ function liveHints(): Task {
   return update;
 }
 
-function partOfDay(hour: number): string {
-  if (hour >= 5 && hour < 12) return "morning";
-  if (hour >= 12 && hour < 17) return "afternoon";
-  if (hour >= 17 && hour < 22) return "evening";
-  return "night";
-}
-
-/** The footer line that follows the visitor's local time. */
-function localTime(): Task {
-  const line = el("foot-time");
-  if (!line) return () => {};
-  return () => {
-    const now = new Date();
-    line.textContent = `It's ${timeFormat.format(now)} on ${weekdayFormat.format(now)} where you are. Whatever you share doesn't have to outlive the ${partOfDay(now.getHours())}.`;
-  };
-}
-
 /** Re-runs the time-based text at every minute boundary. */
 function everyMinute(tasks: Task[]): void {
   const run = (): void => {
@@ -186,75 +126,42 @@ function everyMinute(tasks: Task[]): void {
   run();
 }
 
-/** Pointer-driven depth for the banner shapes and the footer wordmark. */
-function pointerEffects(): void {
-  if (!finePointer.matches || reducedMotion.matches) return;
-
-  const banner = document.querySelector<HTMLElement>(".banner");
-  if (banner) {
-    let frame = 0;
-    banner.addEventListener("pointermove", (event) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const box = banner.getBoundingClientRect();
-        banner.style.setProperty("--px", ((event.clientX - box.left) / box.width - 0.5).toFixed(3));
-        banner.style.setProperty("--py", ((event.clientY - box.top) / box.height - 0.5).toFixed(3));
-      });
-    });
-    banner.addEventListener("pointerleave", () => {
-      cancelAnimationFrame(frame);
-      banner.style.setProperty("--px", "0");
-      banner.style.setProperty("--py", "0");
-    });
-  }
-
-  const footer = document.querySelector<HTMLElement>(".site-foot");
-  const wordmark = document.querySelector<HTMLElement>(".wordmark");
-  if (footer && wordmark) {
-    let frame = 0;
-    footer.addEventListener("pointermove", (event) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const box = wordmark.getBoundingClientRect();
-        const x = Math.min(Math.max((event.clientX - box.left) / box.width, -0.2), 1.2);
-        wordmark.style.setProperty("--mxn", x.toFixed(3));
-        wordmark.style.setProperty("--lean", "9");
-        wordmark.style.setProperty("--dx", `${Math.round(event.clientX - (box.left + box.width / 2))}px`);
-        wordmark.style.setProperty("--dy", `${Math.round(event.clientY - (box.top + box.height * 0.56))}px`);
-      });
-    });
-    footer.addEventListener("pointerleave", () => {
-      cancelAnimationFrame(frame);
-      for (const name of ["--mxn", "--lean", "--dx", "--dy"]) wordmark.style.removeProperty(name);
-    });
-  }
-}
-
-/** Shows the real host in the link diagrams, and sizes the terminal's typing animation. */
-function hostLabels(): void {
-  if (location.host) {
-    document.querySelectorAll<HTMLElement>("[data-host]").forEach((node) => {
-      node.textContent = location.host;
-    });
-  }
-  const command = el("term-command");
-  if (command) command.style.setProperty("--n", String(command.textContent?.length ?? 0));
+/** The hero ring's "DELETES IN 23:59:59", ticking only while it is on screen. */
+function heroCountdown(): void {
+  const clock = el("hero-countdown");
+  const art = clock?.closest(".hero-art");
+  if (!clock || !art || !("IntersectionObserver" in window)) return;
+  const DAY = 24 * 3600;
+  let left = DAY - 1;
+  let timer = 0;
+  let onScreen = false;
+  const pad = (n: number): string => String(n).padStart(2, "0");
+  const tick = (): void => {
+    left = left > 0 ? left - 1 : DAY - 1;
+    clock.textContent = `${pad(Math.floor(left / 3600))}:${pad(Math.floor(left / 60) % 60)}:${pad(left % 60)}`;
+  };
+  const sync = (): void => {
+    const run = onScreen && !document.hidden && !prefersReducedMotion();
+    if (run && !timer) timer = window.setInterval(tick, 1000);
+    if (!run && timer) {
+      window.clearInterval(timer);
+      timer = 0;
+    }
+  };
+  new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) onScreen = entry.isIntersecting;
+      sync();
+    },
+    { threshold: 0.1 },
+  ).observe(art);
+  document.addEventListener("visibilitychange", sync);
+  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", sync);
 }
 
 export function initLanding(): void {
-  const root = document.documentElement;
-  root.classList.remove("no-js");
-  root.classList.add("js");
-  hostLabels();
   accordion();
   focusFormLinks();
-  everyMinute([liveHints(), localTime()]);
-  pointerEffects();
-  if (!("IntersectionObserver" in window)) {
-    document.querySelectorAll("[data-reveal]").forEach((node) => node.classList.add("is-in"));
-    return;
-  }
-  revealOnScroll();
-  playLoopsOnScreen();
-  stickyBar();
+  everyMinute([liveHints()]);
+  heroCountdown();
 }

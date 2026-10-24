@@ -1,80 +1,151 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#2d6ad3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1638" media="(prefers-color-scheme: dark)">
   <title>How it works · One Smart Sheep Secret</title>
   <meta name="description" content="How One Smart Sheep Secret keeps shared passwords and files private: encryption in your browser, keys that never reach the server, self-destructing storage.">
   <link rel="canonical" href="https://secret.nafran.com/security">
   <link rel="alternate" type="text/markdown" href="/security.md">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
 </head>
-<body data-page="static">
-  <header class="topbar">
-    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
-    <nav class="nav" aria-label="Main">
-      <a href="/">Share</a>
-      <a href="/request">Request</a>
-      <a href="/security" aria-current="page">How it works</a>
-      <a href="/agents">For agents</a>
-    </nav>
-  </header>
+<body class="page-security" data-page="static">
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#2d6ad3"/><g fill="#ffffff"><circle cx="10.4" cy="14.6" r="4.6"/><circle cx="16" cy="11.6" r="5.2"/><circle cx="21.6" cy="14.6" r="4.6"/><circle cx="12.6" cy="19.6" r="4.4"/><circle cx="19.4" cy="19.6" r="4.4"/></g><ellipse cx="16" cy="17.4" rx="3.6" ry="4.4" fill="#0f1d44"/><circle cx="14.6" cy="16.5" r="0.85" fill="#ffffff"/><circle cx="17.4" cy="16.5" r="0.85" fill="#ffffff"/><path d="M12.4 15.2c-1.3-.2-2.2.4-2.6 1.3 1 .3 2 .1 2.8-.6zM19.6 15.2c1.3-.2 2.2.4 2.6 1.3-1 .3-2 .1-2.8-.6z" fill="#0f1d44"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+    <symbol id="icon-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.3-8.3M16.5 6.5l2.5 2.5M14 9l2 2"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="icon-eye-off" viewBox="0 0 24 24"><path d="m4 4 16 16M10.6 5.7c.5-.1.9-.2 1.4-.2 6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.9 3.7M6.6 6.9C4 8.6 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.3-1.1"/><path d="M9.9 10a3 3 0 0 0 4.1 4.2"/></symbol>
+    <symbol id="icon-clip" viewBox="0 0 24 24"><path d="m20 11.5-7.6 7.6a5 5 0 0 1-7.1-7.1l8-8a3.4 3.4 0 0 1 4.8 4.8l-7.9 7.9a1.8 1.8 0 0 1-2.6-2.6l7.2-7.2"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 3.2 19.5 6v5.6c0 4.4-3.1 8.1-7.5 9.2-4.4-1.1-7.5-4.8-7.5-9.2V6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></symbol>
+    <symbol id="icon-terminal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3.5"/><path d="m7.5 9.5 2.8 2.5-2.8 2.5M13 15h3.5"/></symbol>
+    <symbol id="icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.4a2.4 2.4 0 1 1 3.3 2.2c-.6.3-1 .8-1 1.5v.4M12 16.6h.01"/></symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></symbol>
+    <symbol id="icon-steps" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="18.5" cy="12" r="2.2"/><path d="M7.7 12h2.1M14.2 12h2.1"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 24 24"><path d="M4 13.5 6.2 5h11.6l2.2 8.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 13.5h4.6l1.2 2.3h4.4l1.2-2.3H20"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5.5 12.5 4.2 4.2 8.8-9.4"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+    <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 14a4.2 4.2 0 0 0 6 .3l2.8-2.8a4.2 4.2 0 0 0-6-6L11.5 7"/><path d="M14 10a4.2 4.2 0 0 0-6-.3l-2.8 2.8a4.2 4.2 0 0 0 6 6l1.2-1.2"/></symbol>
+    <symbol id="icon-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5.5l-3 13"/></symbol>
+    <symbol id="icon-chevrons" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24"><path d="M12 3.5 4.5 7.5v9l7.5 4 7.5-4v-9z"/><path d="M4.5 7.5 12 11.5l7.5-4M12 11.5v9"/></symbol>
+    <symbol id="icon-browser" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M3 9h18M7 14h5"/></symbol>
+    <symbol id="icon-server" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="2.2"/><rect x="4" y="13" width="16" height="7" rx="2.2"/><path d="M8 7.5h.01M8 16.5h.01"/></symbol>
+    <symbol id="icon-flame" viewBox="0 0 24 24"><path d="M12 20.5c-3.7 0-6.5-2.7-6.5-6.3 0-2.6 1.6-4.4 3-5.8.3 1.5 1.1 2.6 2.2 3 0-3 1-6 4-8 0 2.6 1 4.2 2.3 5.7 1.1 1.3 1.9 2.8 1.9 4.9 0 3.7-3 6.5-6.9 6.5z"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h13.5M13 6.5l5.5 5.5-5.5 5.5"/></symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24"><path d="M20.5 3.5 10.2 13.8M20.5 3.5 14 20.5l-3.8-6.7L3.5 10z"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 4.5v10.5M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></symbol>
+  </svg>
 
-  <main>
-    <section class="card">
-      <h1>How your secrets stay secret</h1>
-      <p class="lede">We built this so that nobody, including us and our hosting provider, can read what you share.</p>
-      <ul class="features">
-        <li>
-          <h2>Encrypted before it leaves your device</h2>
-          <p>Your browser encrypts everything with AES-256-GCM using its built-in Web Crypto engine. Only scrambled data ever reaches our servers.</p>
-        </li>
-        <li>
-          <h2>The key never reaches us</h2>
-          <p>The decryption key lives in the part of the link after the <code>#</code>, which browsers never send to a server. The page also removes it from the address bar as soon as it opens.</p>
-        </li>
-        <li>
-          <h2>Passphrases are a real second lock</h2>
-          <p>A passphrase is mixed into the encryption key (PBKDF2-SHA256, 600,000 rounds) and is never sent to us. After 5 wrong attempts the secret is destroyed.</p>
-        </li>
-        <li>
-          <h2>Truly one-time</h2>
-          <p>Each secret lives in its own strongly consistent Cloudflare Durable Object, so even if two people click at the same instant, only one of them can open a one-time secret.</p>
-        </li>
-        <li>
-          <h2>Gone for good</h2>
-          <p>Secrets are deleted the moment their last view is used, and exact timers delete them at expiry. Files are erased from storage too. Afterwards only a receipt remains for 30 days (times and countries, no content).</p>
-        </li>
-        <li>
-          <h2>Requests only you can open</h2>
-          <p>Request links use public-key encryption (ECDH P-256). Your client encrypts with a key from the link, and only your private inbox link can decrypt it.</p>
-        </li>
-        <li>
-          <h2>No tracking, no third parties</h2>
-          <p>No accounts, cookies, analytics or third-party scripts. Pages run under a strict Content Security Policy with Trusted Types, so injected code can't run.</p>
-        </li>
-        <li>
-          <h2>Even sizes are hidden</h2>
-          <p>Everything is padded before encryption, to at least 1 KB, so the stored size shows only a rough size range, never the exact length of your secret or file.</p>
-        </li>
-      </ul>
-    </section>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    <section class="card">
-      <h2>What we store, and for how long</h2>
-      <p class="muted">Encrypted data, its padded size, timestamps, the country a secret was opened from (for your receipt) and one-way hashes of access tokens. Content is deleted on view or expiry; receipts after 30 days. Like any cloud service, Cloudflare may keep encrypted backups for up to 30 days, and without your link those are unreadable.</p>
-      <h2>What no website can protect against</h2>
-      <p class="muted">A compromised device or a malicious browser extension can read anything you see. Sending the link and the passphrase in the same message weakens the second lock. Anyone who gets the full link before your recipient can open it, which your receipt will show.</p>
-      <h2>Good habits</h2>
-      <p class="muted">Use a passphrase for anything important, and send it a different way. Keep expiry short and views at one. Check the receipt and destroy anything you no longer need.</p>
-    </section>
-  </main>
+  <div class="stage">
+    <div class="window">
+      <header class="top">
+        <a class="brand" href="/">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><use href="#logo"/></svg>
+          <span class="brand-text"><span class="brand-name">One Smart Sheep</span><span class="brand-tag">secret</span></span>
+        </a>
+        <div class="bar">
+          <form class="go" id="go-form" novalidate>
+            <label class="visually-hidden" for="go-link">Open a secret, receipt, request or inbox link</label>
+            <svg class="ico go-ico" aria-hidden="true"><use href="#icon-link"/></svg>
+            <input class="go-input" type="url" id="go-link" inputmode="url" enterkeyhint="go" placeholder="Paste a secret, receipt or inbox link…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="go-error">
+            <button class="go-btn" type="submit" aria-label="Open link"><svg class="ico" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+            <p class="go-error" id="go-error" role="alert" hidden></p>
+          </form>
+          <nav class="tabs" aria-label="Main">
+          <a class="tab" href="/"><svg class="ico" aria-hidden="true"><use href="#icon-send"/></svg><span>Share</span></a>
+          <a class="tab" href="/request"><svg class="ico" aria-hidden="true"><use href="#icon-inbox"/></svg><span>Request</span></a>
+          <a class="tab" href="/security" aria-current="page"><svg class="ico" aria-hidden="true"><use href="#icon-shield"/></svg><span>Security</span></a>
+          <a class="tab" href="/agents"><svg class="ico" aria-hidden="true"><use href="#icon-terminal"/></svg><span>For agents</span></a>
+          </nav>
+          <a class="star" href="https://github.com/aamirmursleen/keyburn.dev" target="_blank" rel="noopener noreferrer" aria-label="Star on GitHub (opens in a new tab)"><span class="star-in"><svg class="ico ico-star" aria-hidden="true"><use href="#icon-star"/></svg><span class="star-text">Star</span></span></a>
+        </div>
+      </header>
 
-  <footer class="foot">
-    <p>Encrypted in your browser · Self-destructing · No accounts, cookies or tracking</p>
-  </footer>
+      <aside class="side" aria-label="Shortcuts and tips">
+        <div class="side-inner">
+          <div class="side-ctas">
+            <a class="side-cta primary" href="/#compose"><svg class="ico" aria-hidden="true"><use href="#icon-plus"/></svg><span>New secret</span></a>
+            <a class="side-cta" href="/request"><svg class="ico" aria-hidden="true"><use href="#icon-inbox"/></svg><span>Request a secret</span></a>
+          </div>
+          <nav class="toc" aria-labelledby="toc-label">
+            <p class="side-label" id="toc-label">On this page</p>
+            <ul class="toc-list">
+              <li><a class="toc-link" href="#protect"><svg class="ico" aria-hidden="true"><use href="#icon-shield"/></svg><span>How it stays secret</span></a></li>
+              <li><a class="toc-link" href="#store"><svg class="ico" aria-hidden="true"><use href="#icon-server"/></svg><span>What we store</span></a></li>
+              <li><a class="toc-link" href="#limits"><svg class="ico" aria-hidden="true"><use href="#icon-eye-off"/></svg><span>What we can't stop</span></a></li>
+              <li><a class="toc-link" href="#habits"><svg class="ico" aria-hidden="true"><use href="#icon-check"/></svg><span>Good habits</span></a></li>
+            </ul>
+          </nav>
+          <div class="habits">
+            <p class="habits-head"><span class="habits-ico" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="#icon-shield"/></svg></span>Good habits</p>
+            <ul class="habits-list">
+              <li><svg class="ico" aria-hidden="true"><use href="#icon-check"/></svg>Keep views at one</li>
+              <li><svg class="ico" aria-hidden="true"><use href="#icon-check"/></svg>Keep the expiry short</li>
+              <li><svg class="ico" aria-hidden="true"><use href="#icon-check"/></svg>Send the passphrase another way</li>
+            </ul>
+          </div>
+          <p class="side-status"><i class="dot live" aria-hidden="true"></i>End-to-end encrypted</p>
+        </div>
+      </aside>
+
+      <main class="main" id="main" tabindex="-1">
+          <div class="page-head">
+            <p class="eyebrow">Security model</p>
+            <h1 class="page-title">How your secrets stay secret</h1>
+            <p class="page-lede">We built this so that nobody, including us and our hosting provider, can read what you share.</p>
+            <a class="doc-link" href="https://github.com/aamirmursleen/keyburn.dev/blob/main/docs/SECURITY.md" target="_blank" rel="noopener noreferrer">Read docs/SECURITY.md on GitHub<span aria-hidden="true"> ↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+          </div>
+
+          <section class="protect" id="protect" aria-labelledby="protect-title">
+            <h2 class="visually-hidden" id="protect-title">How it stays secret</h2>
+            <ol class="protect-list">
+              <li><span class="protect-num" aria-hidden="true">01</span><div><h3>Encrypted before it leaves your device</h3><p>Your browser encrypts everything with AES-256-GCM using its built-in Web Crypto engine. Only scrambled data ever reaches our servers.</p></div></li>
+              <li><span class="protect-num" aria-hidden="true">02</span><div><h3>The key never reaches us</h3><p>The decryption key lives in the part of the link after the <code>#</code>, which browsers never send to a server. The page also removes it from the address bar as soon as it opens.</p></div></li>
+              <li><span class="protect-num" aria-hidden="true">03</span><div><h3>Passphrases are a real second lock</h3><p>A passphrase is mixed into the encryption key (PBKDF2-SHA256, 600,000 rounds) and is never sent to us. After 5 wrong attempts the secret is destroyed.</p></div></li>
+              <li><span class="protect-num" aria-hidden="true">04</span><div><h3>Truly one-time</h3><p>Each secret lives in its own strongly consistent Cloudflare Durable Object, so even if two people click at the same instant, only one of them can open a one-time secret.</p></div></li>
+              <li><span class="protect-num" aria-hidden="true">05</span><div><h3>Gone for good</h3><p>Secrets are deleted the moment their last view is used, and exact timers delete them at expiry. Files are erased from storage too. Afterwards only a receipt remains for 30 days (times and countries, no content).</p></div></li>
+              <li><span class="protect-num" aria-hidden="true">06</span><div><h3>Requests only you can open</h3><p>Request links use public-key encryption (ECDH P-256). Your client encrypts with a key from the link, and only your private inbox link can decrypt it.</p></div></li>
+              <li><span class="protect-num" aria-hidden="true">07</span><div><h3>No tracking, no third parties</h3><p>No accounts, cookies, analytics or third-party scripts. Pages run under a strict Content Security Policy with Trusted Types, so injected code can't run.</p></div></li>
+              <li><span class="protect-num" aria-hidden="true">08</span><div><h3>Even sizes are hidden</h3><p>Everything is padded before encryption, to at least 1 KB, so the stored size shows only a rough size range, never the exact length of your secret or file.</p></div></li>
+            </ol>
+          </section>
+
+          <section class="panel store" aria-label="What we store and what we can't stop">
+            <div class="store-row" id="store">
+              <h2>What we store, and for how long</h2>
+              <p>Encrypted data, its padded size, timestamps, the country a secret was opened from (for your receipt) and one-way hashes of access tokens. Content is deleted on view or expiry; receipts after 30 days. Like any cloud service, Cloudflare may keep encrypted backups for up to 30 days, and without your link those are unreadable.</p>
+            </div>
+            <div class="store-row" id="limits">
+              <h2>What no website can protect against</h2>
+              <p>A compromised device or a malicious browser extension can read anything you see. Sending the link and the passphrase in the same message weakens the second lock. Anyone who gets the full link before your recipient can open it, which your receipt will show.</p>
+            </div>
+            <div class="store-row" id="habits">
+              <h2>Good habits</h2>
+              <p>Use a passphrase for anything important, and send it a different way. Keep expiry short and views at one. Check the receipt and destroy anything you no longer need.</p>
+            </div>
+          </section>
+      </main>
+
+      <footer class="foot">
+        <p class="foot-line">
+          <span class="foot-item"><svg class="foot-mark" viewBox="0 0 32 32" aria-hidden="true"><use href="#logo"/></svg>Made by One Smart Sheep</span>
+          <span class="foot-item">Runs on Cloudflare's edge</span>
+          <span class="foot-item">No accounts, cookies or tracking</span>
+          <a class="foot-repo" href="https://github.com/aamirmursleen/keyburn.dev" target="_blank" rel="noopener noreferrer">github.com/aamirmursleen/keyburn.dev<span aria-hidden="true"> ↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+        </p>
+      </footer>
+    </div>
+  </div>
 </body>
 </html>

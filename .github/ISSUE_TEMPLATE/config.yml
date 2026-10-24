@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/aamirmursleen/keyburn.dev/security/advisories/new
+    about: Please report vulnerabilities privately, not as issues.
+  - name: Security model
+    url: https://github.com/aamirmursleen/keyburn.dev/blob/main/docs/SECURITY.md
+    about: How keyburn keeps secrets away from the server, and its limits.
