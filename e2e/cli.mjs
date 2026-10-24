@@ -13,6 +13,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 import { chromium } from "playwright";
+import { startServer, stopServer } from "./server.mjs";
 
 const PORT = Number(process.env.E2E_PORT ?? 8799) + 1;
 const BASE = `http://localhost:${PORT}`;
@@ -20,30 +21,6 @@ const VERSION = /VERSION = "([\d.]+)"/.exec(await readFile(new URL("../src/cli/v
 const CLI = new URL(`../public/cli/osss-${VERSION}.mjs`, import.meta.url).pathname;
 const HOME = await mkdtemp(join(tmpdir(), "osss-e2e-"));
 const ENV = { ...process.env, OSSS_ORIGIN: BASE, OSSS_HOME: HOME, NODE_OPTIONS: "" };
-
-async function startServer() {
-  await rm(`.wrangler/e2e-state-${PORT}`, { recursive: true, force: true });
-  const child = spawn(
-    "npx",
-    ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1", "--local-upstream", `localhost:${PORT}`, "--persist-to", `.wrangler/e2e-state-${PORT}`, "--show-interactive-dev-session=false"],
-    { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, OSSS_DEV: "1" } },
-  );
-  let log = "";
-  await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`wrangler dev did not start:\n${log}`)), 90_000);
-    const onData = (chunk) => {
-      log += chunk;
-      if (log.includes("Ready on")) {
-        clearTimeout(timer);
-        resolve();
-      }
-    };
-    child.stdout.on("data", onData);
-    child.stderr.on("data", onData);
-    child.on("exit", (code) => reject(new Error(`wrangler dev exited (${code}):\n${log}`)));
-  });
-  return child;
-}
 
 /**
  * Runs the CLI without a controlling terminal (detached), like an agent's shell tool does,
@@ -289,7 +266,7 @@ async function run(browser) {
   assert.equal(await reader.textContent("#v-text"), "made by the cli 🐑");
 }
 
-const server = await startServer();
+const server = await startServer(PORT);
 const browser = await chromium.launch();
 try {
   await run(browser);
@@ -299,6 +276,6 @@ try {
   process.exitCode = 1;
 } finally {
   await browser.close();
-  server.kill("SIGTERM");
+  stopServer(server);
   await rm(HOME, { recursive: true, force: true });
 }

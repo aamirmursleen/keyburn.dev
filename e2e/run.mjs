@@ -7,9 +7,9 @@
 //        E2E_BASE=https://keyburn.dev npm run e2e   (smoke-test a live deployment)
 
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
-import { mkdir, readFile, rm } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { chromium } from "playwright";
+import { startServer, stopServer } from "./server.mjs";
 
 // E2E_PORT lets several runs (e.g. parallel work trees) share one machine.
 const PORT = Number(process.env.E2E_PORT ?? 8799);
@@ -19,35 +19,15 @@ const ARTIFACTS = new URL("./artifacts/", import.meta.url);
 const issues = [];
 const outbound = [];
 // The deliberate wrong-passphrase attempt returns 403; Chrome logs it as a failed load.
-const EXPECTED = [/^\[reveal\] error: Failed to load resource: the server responded with a status of 403/];
+const EXPECTED = [
+  /^\[reveal\] error: Failed to load resource: the server responded with a status of 403/,
+  // Browsers warn about Permissions-Policy features they don't support (Chromium on Linux has no
+  // Web Bluetooth); the header still denies them wherever they exist.
+  /^\[[\w-]+\] warning: Error with Permissions-Policy header: Unrecognized feature: '[\w-]+'\.$/,
+];
 
 function art(name) {
   return new URL(name, ARTIFACTS).pathname;
-}
-
-async function startServer() {
-  await rm(`.wrangler/e2e-state-${PORT}`, { recursive: true, force: true });
-  const child = spawn(
-    "npx",
-    ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1", "--local-upstream", `localhost:${PORT}`, "--persist-to", `.wrangler/e2e-state-${PORT}`, "--show-interactive-dev-session=false"],
-    // OSSS_DEV=1: a local server may run an agent tool build that isn't recorded as a release yet.
-    { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, OSSS_DEV: "1" } },
-  );
-  let log = "";
-  await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`wrangler dev did not start:\n${log}`)), 90_000);
-    const onData = (chunk) => {
-      log += chunk;
-      if (log.includes("Ready on")) {
-        clearTimeout(timer);
-        resolve();
-      }
-    };
-    child.stdout.on("data", onData);
-    child.stderr.on("data", onData);
-    child.on("exit", (code) => reject(new Error(`wrangler dev exited (${code}):\n${log}`)));
-  });
-  return child;
 }
 
 /** Records console problems and every request URL + body for leak checks. */
@@ -239,7 +219,7 @@ async function run(browser) {
 }
 
 await mkdir(ARTIFACTS, { recursive: true });
-const server = LIVE ? null : await startServer();
+const server = LIVE ? null : await startServer(PORT);
 // E2E_HOST_MAP="host ip" pins DNS (useful right after a deploy, before caches update).
 const hostMap = process.env.E2E_HOST_MAP;
 const browser = await chromium.launch({ args: hostMap ? [`--host-resolver-rules=MAP ${hostMap}`] : [] });
@@ -258,5 +238,5 @@ try {
   process.exitCode = 1;
 } finally {
   await browser.close();
-  server?.kill("SIGTERM");
+  stopServer(server);
 }

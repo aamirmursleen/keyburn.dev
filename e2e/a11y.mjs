@@ -5,40 +5,16 @@
 // Usage: npm run build && node e2e/a11y.mjs
 //        E2E_BASE=https://keyburn.dev node e2e/a11y.mjs   (check a live deployment)
 
-import { spawn } from "node:child_process";
-import { readFile, rm } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { chromium } from "playwright";
+import { startServer, stopServer } from "./server.mjs";
 
 const PORT = Number(process.env.E2E_A11Y_PORT ?? 8797);
 const LIVE = process.env.E2E_BASE?.replace(/\/$/, "");
 const BASE = LIVE ?? `http://localhost:${PORT}`;
 const AXE = await readFile(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22a", "wcag22aa"];
-
-async function startServer() {
-  await rm(`.wrangler/e2e-state-${PORT}`, { recursive: true, force: true });
-  const child = spawn(
-    "npx",
-    ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1", "--local-upstream", `localhost:${PORT}`, "--persist-to", `.wrangler/e2e-state-${PORT}`, "--show-interactive-dev-session=false"],
-    { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, OSSS_DEV: "1" } },
-  );
-  let log = "";
-  await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`wrangler dev did not start:\n${log}`)), 90_000);
-    const onData = (chunk) => {
-      log += chunk;
-      if (log.includes("Ready on")) {
-        clearTimeout(timer);
-        resolve();
-      }
-    };
-    child.stdout.on("data", onData);
-    child.stderr.on("data", onData);
-    child.on("exit", (code) => reject(new Error(`wrangler dev exited (${code}):\n${log}`)));
-  });
-  return child;
-}
 
 const violations = [];
 const unsure = [];
@@ -232,7 +208,7 @@ async function run(browser) {
   }
 }
 
-const server = LIVE ? null : await startServer();
+const server = LIVE ? null : await startServer(PORT);
 const browser = await chromium.launch();
 try {
   await run(browser);
@@ -251,5 +227,5 @@ try {
   process.exitCode = 1;
 } finally {
   await browser.close();
-  server?.kill("SIGTERM");
+  stopServer(server);
 }
