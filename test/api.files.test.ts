@@ -257,7 +257,9 @@ describe("encrypted file attachments", () => {
       expect(queued).toEqual([key]);
       await runAlarm("secret", secret.id);
       await deleted(key);
-      expect(await runInDurableObject(stub, (_v: Vault, s: DurableObjectState) => s.storage.kv.get("r2del"))).toBeUndefined();
+      // The retry alarm is due immediately, so the runtime may also fire it on its own; wait
+      // for whichever run is in flight to finish clearing the queue.
+      await eventually(async () => (await runInDurableObject(stub, (_v: Vault, s: DurableObjectState) => s.storage.kv.get("r2del"))) === undefined);
     } finally {
       restore();
     }
