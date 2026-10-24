@@ -1,5 +1,5 @@
 // Progressive enhancements for the homepage: the FAQ accordion, "create a secret" links that
-// put the cursor in the form, live hints next to the form options and the hero's countdown.
+// put the cursor in the form, live hints next to the form options.
 // (Shared chrome, scroll reveals and loops live in shell.ts and motion.ts.)
 //
 // The page is complete without this file: content is visible and readable, the accordion
@@ -126,42 +126,8 @@ function everyMinute(tasks: Task[]): void {
   run();
 }
 
-/** The hero ring's "DELETES IN 23:59:59", ticking only while it is on screen. */
-function heroCountdown(): void {
-  const clock = el("hero-countdown");
-  const art = clock?.closest(".hero-art");
-  if (!clock || !art || !("IntersectionObserver" in window)) return;
-  const DAY = 24 * 3600;
-  let left = DAY - 1;
-  let timer = 0;
-  let onScreen = false;
-  const pad = (n: number): string => String(n).padStart(2, "0");
-  const tick = (): void => {
-    left = left > 0 ? left - 1 : DAY - 1;
-    clock.textContent = `${pad(Math.floor(left / 3600))}:${pad(Math.floor(left / 60) % 60)}:${pad(left % 60)}`;
-  };
-  const sync = (): void => {
-    const run = onScreen && !document.hidden && !prefersReducedMotion();
-    if (run && !timer) timer = window.setInterval(tick, 1000);
-    if (!run && timer) {
-      window.clearInterval(timer);
-      timer = 0;
-    }
-  };
-  new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) onScreen = entry.isIntersecting;
-      sync();
-    },
-    { threshold: 0.1 },
-  ).observe(art);
-  document.addEventListener("visibilitychange", sync);
-  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", sync);
-}
-
 export function initLanding(): void {
   accordion();
   focusFormLinks();
   everyMinute([liveHints()]);
-  heroCountdown();
 }

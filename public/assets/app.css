@@ -2021,17 +2021,19 @@ progress::-moz-progress-bar {
   stroke-width: 12;
 }
 
+/* A still picture: five sixths of the time left, the marker at the end of the bar. */
 .ring-bar {
   fill: none;
   stroke: var(--sky-2);
   stroke-width: 12;
   stroke-linecap: round;
   stroke-dasharray: 716.3;
-  stroke-dashoffset: 0;
+  stroke-dashoffset: -119.4;
 }
 
 .ring-orbit {
   transform-origin: 160px 150px;
+  transform: rotate(60deg);
 }
 
 .orbit-dot {
@@ -2086,37 +2088,6 @@ progress::-moz-progress-bar {
 .rc-plain {
   fill: #1d2433;
   font: 400 11px var(--mono);
-}
-
-.rc-cipher {
-  fill: #2d6ad3;
-  font: 400 11px var(--mono);
-  opacity: 0;
-}
-
-.ring-shards {
-  fill: #ffffff;
-  opacity: 0;
-}
-
-.sh-1 { --dx: -46px; --dy: -38px; }
-.sh-2 { --dx: 6px; --dy: -52px; }
-.sh-3 { --dx: 52px; --dy: -26px; }
-.sh-4 { --dx: -52px; --dy: 30px; }
-.sh-5 { --dx: 8px; --dy: 48px; }
-.sh-6 { --dx: 48px; --dy: 34px; }
-
-.ring-done {
-  opacity: 0;
-}
-
-.ring-done rect {
-  fill: #e2f5eb;
-}
-
-.ring-done text {
-  fill: #17744a;
-  font: 600 11.5px var(--sans);
 }
 
 /* ==== Home: compose and result ==================================================================================== */
@@ -4563,57 +4534,6 @@ pre.code code {
 .loop.is-playing *::before,
 .loop.is-playing *::after {
   animation-play-state: running !important;
-}
-
-/* ---- Hero: a secret counts down, turns to ciphertext and self-destructs (9 s) ---- */
-
-.js .hero-art .ring-dots { animation: spin 60s linear infinite; }
-.js .hero-art .ring-bar { animation: ring-drain 9s linear infinite; }
-.js .hero-art .ring-orbit { animation: spin 9s linear infinite; }
-.js .hero-art .ring-card { animation: ring-card 9s ease-in-out infinite; }
-.js .hero-art .rc-plain { animation: ring-plain 9s ease-in-out infinite; }
-.js .hero-art .rc-cipher { animation: ring-cipher 9s ease-in-out infinite; }
-.js .hero-art .ring-shards { animation: ring-shards 9s linear infinite; }
-.js .hero-art .sh { animation: ring-shard 9s cubic-bezier(0.2, 0.7, 0.3, 1) infinite; }
-.js .hero-art .ring-done { animation: ring-done 9s ease-in-out infinite; }
-
-@keyframes ring-drain {
-  to { stroke-dashoffset: -716.3; }
-}
-
-@keyframes ring-card {
-  0%, 80% { opacity: 1; }
-  88%, 97% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes ring-plain {
-  0%, 30% { opacity: 1; }
-  36%, 97% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes ring-cipher {
-  0%, 30% { opacity: 0; }
-  36%, 97% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes ring-shards {
-  0%, 79% { opacity: 0; }
-  82% { opacity: 1; }
-  95%, 100% { opacity: 0; }
-}
-
-@keyframes ring-shard {
-  0%, 80% { transform: translate(0, 0); }
-  95%, 100% { transform: translate(var(--dx), var(--dy)); }
-}
-
-@keyframes ring-done {
-  0%, 86% { opacity: 0; }
-  90%, 96% { opacity: 1; }
-  100% { opacity: 0; }
 }
 
 /* ---- How it works: encrypt, share, burn (4.2 s) ---- */
