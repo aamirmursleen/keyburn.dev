@@ -39,10 +39,7 @@ so it can't read what you share. And with the `osss` tool, **AI agents like Clau
 secret without ever seeing it.**
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/screenshot-dark.png">
-    <img alt="The keyburn web app: share a secret" src=".github/assets/screenshot-light.png" width="92%">
-  </picture>
+  <img alt="The keyburn web app: share a secret" src=".github/assets/screenshot.png" width="92%">
 </p>
 
 ## ✦ Features

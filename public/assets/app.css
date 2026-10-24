@@ -119,90 +119,6 @@
   --pad-r: clamp(20px, 3vw, 40px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-
-    --page: #10245c;
-    --page-deep: #0b1638;
-    --window: #0e1a3a;
-    --window-shadow: 0 50px 90px -30px rgb(0 0 0 / 70%), 0 0 0 1px rgb(255 255 255 / 6%);
-    --side: #1b4fb4;
-
-    --ink: #e8edf7;
-    --ink-2: #d2d9e8;
-    --ink-3: #b9c3d8;
-    --muted: #9ca8c0;
-    --soft: #7884a0;
-    --placeholder: #8792ab;
-
-    --line: rgb(255 255 255 / 11%);
-    --line-2: rgb(255 255 255 / 7%);
-    --line-3: rgb(255 255 255 / 12%);
-    --rule: rgb(255 255 255 / 9%);
-    --rule-faq: rgb(255 255 255 / 10%);
-    --dash: rgb(255 255 255 / 20%);
-
-    --card: #14234a;
-    --card-2: #172952;
-    --tile: #1b2d5a;
-    --field: #0b1534;
-    --field-2: #0b1534;
-    --go-bg: #15244b;
-    --chip: rgb(255 255 255 / 8%);
-    --chip-hover: rgb(255 255 255 / 13%);
-    --ghost-hover: rgb(255 255 255 / 7%);
-    --row-hover: rgb(255 255 255 / 4%);
-    --kv-line: rgb(255 255 255 / 7%);
-
-    --accent: #2d6ad3;
-    --accent-hover: #2660c4;
-    --accent-strong: #9cbcff;
-    --accent-text: #8fb4ff;
-    --accent-soft: rgb(125 168 255 / 15%);
-    --accent-soft-2: rgb(125 168 255 / 22%);
-    --accent-ring: rgb(125 168 255 / 18%);
-    --accent-shadow: 0 14px 28px -14px rgb(0 0 0 / 80%);
-    --title: #9cbcff;
-    --brand: #9cbcff;
-    --drop: rgb(125 168 255 / 10%);
-
-    --navy: #091331;
-    --navy-2: #050c22;
-    --navy-3: #0a1430;
-    --navy-edge: rgb(255 255 255 / 8%);
-
-    --green-ink: #7ddcaa;
-    --green-soft: rgb(30 158 94 / 18%);
-    --green-line: rgb(125 220 170 / 35%);
-    --amber: #ffc56b;
-    --amber-ink: #ffd78a;
-    --amber-text: #f0d29a;
-    --amber-soft: rgb(242 177 12 / 14%);
-    --amber-box: rgb(242 177 12 / 10%);
-    --amber-line: rgb(242 177 12 / 28%);
-    --amber-btn: rgb(242 177 12 / 18%);
-    --amber-btn-hover: rgb(242 177 12 / 26%);
-    --red: #e04a3f;
-    --red-ink: #ffaaa2;
-    --red-soft: rgb(217 59 48 / 18%);
-    --red-soft-hover: rgb(217 59 48 / 26%);
-    --red-box: rgb(217 59 48 / 15%);
-    --violet: #c3b2ff;
-    --violet-soft: rgb(106 75 219 / 22%);
-    --violet-line: rgb(195 178 255 / 30%);
-    --violet-bg: rgb(106 75 219 / 12%);
-    --pink: #ff9ccb;
-    --pink-soft: rgb(194 61 126 / 22%);
-    --cyan: #7fdbef;
-    --cyan-soft: rgb(14 124 147 / 24%);
-    --badge: rgb(255 255 255 / 9%);
-    --badge-ink: #c2cbe0;
-
-    --focus: #8fb4ff;
-  }
-}
-
 /* ==== Base ==================================================================================== */
 
 *,
@@ -226,13 +142,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background: radial-gradient(1200px 700px at 50% -14%, rgb(45 106 211 / 38%), transparent 70%),
-      linear-gradient(180deg, var(--page) 0%, var(--page-deep) 900px);
-  }
 }
 
 [hidden] {
@@ -4986,52 +4895,6 @@ pre.code code {
 
   .js [data-reveal]:not(.is-in) {
     transform: none;
-  }
-}
-
-/* ==== Dark mode details ======================================================================================== */
-
-@media (prefers-color-scheme: dark) {
-  .go-ico {
-    color: #7d89a6;
-  }
-
-  .brand-mark {
-    box-shadow: 0 10px 22px -10px rgb(0 0 0 / 80%);
-  }
-
-  .btn.light {
-    box-shadow: 0 14px 28px -14px rgb(0 0 0 / 80%);
-  }
-
-  .see-rows li,
-  .see-url,
-  .enc {
-    background: var(--field);
-  }
-
-  .pipe-line::before {
-    border-color: rgb(143 180 255 / 35%);
-  }
-
-  .rc-bg {
-    fill: #ffffff;
-  }
-
-  .b-pass {
-    border-color: var(--line);
-  }
-
-  .dot {
-    background: #4a5675;
-  }
-
-  .events li::before {
-    border-color: var(--navy);
-  }
-
-  .dialog::backdrop {
-    background: rgb(2 6 20 / 60%);
   }
 }
 
