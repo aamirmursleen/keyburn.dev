@@ -161,6 +161,24 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
     await res.arrayBuffer();
   });
 
+  it("serves the logo images with their types", async () => {
+    for (const [path, type] of [
+      ["/assets/brand/keyburn-mark-animated.webp", "image/webp"],
+      ["/assets/brand/keyburn-mark.webp", "image/webp"],
+      ["/assets/brand/favicon-32.png", "image/png"],
+      ["/assets/brand/apple-touch-icon.png", "image/png"],
+    ]) {
+      const res = await fetchPage(`https://secret.onesmartsheep.com${path}`);
+      expect(res.status, path).toBe(200);
+      expect(res.headers.get("content-type"), path).toBe(type);
+      expectHardened(res.headers);
+      await res.arrayBuffer();
+    }
+    const page = await fetchPage("https://secret.onesmartsheep.com/");
+    expect(page.headers.get("content-security-policy")).toContain("img-src https://secret.onesmartsheep.com/assets/logo.svg https://secret.onesmartsheep.com/favicon.svg https://secret.onesmartsheep.com/assets/brand/;");
+    await page.arrayBuffer();
+  });
+
   it("serves the self-hosted fonts as woff2", async () => {
     const res = await fetchPage("https://secret.onesmartsheep.com/assets/fonts/poppins-400-latin.woff2");
     expect(res.status).toBe(200);
@@ -207,6 +225,8 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       "/assets/fonts/missing.woff2",
       "/assets/fonts/%2e%2e/%2e%2e/wrangler.jsonc",
       "/assets/fonts/poppins-400-latin.woff2.map",
+      "/assets/brand/missing.webp",
+      "/assets/brand/keyburn-mark.svg",
       "/s.md",
       "/m.md",
       "/.well-known/api-catalog.json",

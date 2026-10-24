@@ -62,6 +62,8 @@ const ROOT_FILES = new Set(["/favicon.svg", "/.well-known/security.txt"]);
 const ASSET = /^\/assets\/[a-z0-9-]+\.(?:js|css|svg)$/;
 /** Self-hosted web fonts (Poppins, JetBrains Mono; SIL Open Font License). */
 const FONT = /^\/assets\/fonts\/[a-z0-9-]+\.woff2$/;
+/** The KeyBurn logo: animated and still WebP, favicon and home-screen icon. */
+const BRAND = /^\/assets\/brand\/[a-z0-9-]+\.(webp|png)$/;
 /** The agent tool: versioned files only (each pinned by its SHA-256), and SHA256SUMS. */
 const CLI_FILE = /^\/cli\/(?:osss-\d{1,3}\.\d{1,3}\.\d{1,3}\.mjs|SHA256SUMS)$/;
 
@@ -123,6 +125,12 @@ async function serveStatic(request: Request, env: Env, url: URL): Promise<Respon
     const font = await fetchAsset(env, url.pathname, request, true);
     if (font.status === 200 || font.status === 304) return harden(withType(font, "font/woff2"), "asset", url);
     await font.body?.cancel();
+  }
+  const brand = BRAND.exec(url.pathname);
+  if (brand) {
+    const image = await fetchAsset(env, url.pathname, request, true);
+    if (image.status === 200 || image.status === 304) return harden(withType(image, `image/${brand[1]}`), "asset", url);
+    await image.body?.cancel();
   }
   if (ASSET.test(url.pathname) || ROOT_FILES.has(url.pathname)) {
     const asset = await fetchAsset(env, url.pathname, request, true);

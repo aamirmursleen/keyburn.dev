@@ -338,12 +338,20 @@ main:focus-visible {
 }
 
 .brand-mark {
+  display: block;
   flex: none;
   width: 40px;
   height: 40px;
   border-radius: 12px;
+  overflow: hidden;
   box-shadow: 0 10px 20px -10px rgb(45 106 211 / 90%);
   transition: transform 0.4s var(--ease);
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .brand:hover .brand-mark {

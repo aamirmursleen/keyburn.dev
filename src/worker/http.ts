@@ -21,7 +21,7 @@ const pageCsp = (origin: string): string[] => [
   "default-src 'none'",
   `script-src ${origin}/assets/app.js`,
   `style-src ${origin}/assets/app.css`,
-  `img-src ${origin}/assets/logo.svg ${origin}/favicon.svg`,
+  `img-src ${origin}/assets/logo.svg ${origin}/favicon.svg ${origin}/assets/brand/`,
   `font-src ${origin}/assets/fonts/`,
   `connect-src ${origin}/api/v1/`,
   "manifest-src 'none'",
