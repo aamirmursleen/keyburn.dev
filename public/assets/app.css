@@ -1983,113 +1983,6 @@ progress::-moz-progress-bar {
   font-weight: 500;
 }
 
-.hero-art {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  flex: 0 1 330px;
-  min-width: 240px;
-  margin: 0 auto;
-}
-
-/* A little less ring and a little more headline until the window reaches its full width. */
-@media (max-width: 1440px) {
-  .hero-art {
-    flex-basis: 300px;
-  }
-}
-
-.ring {
-  display: block;
-  width: 100%;
-  max-width: 330px;
-  height: auto;
-  overflow: visible;
-}
-
-.ring-dots {
-  fill: none;
-  stroke: rgb(255 255 255 / 22%);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 7;
-  transform-origin: 160px 150px;
-}
-
-.ring-track {
-  fill: none;
-  stroke: rgb(255 255 255 / 12%);
-  stroke-width: 12;
-}
-
-/* A still picture: five sixths of the time left, the marker at the end of the bar. */
-.ring-bar {
-  fill: none;
-  stroke: var(--sky-2);
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-dasharray: 716.3;
-  stroke-dashoffset: -119.4;
-}
-
-.ring-orbit {
-  transform-origin: 160px 150px;
-  transform: rotate(60deg);
-}
-
-.orbit-dot {
-  fill: #ffffff;
-}
-
-.orbit-core {
-  fill: var(--side);
-}
-
-.ring-label {
-  fill: rgb(255 255 255 / 78%);
-  font: 400 10px var(--mono);
-  letter-spacing: 2px;
-}
-
-.ring-time {
-  fill: #ffffff;
-  font: 700 17px var(--mono);
-  font-variant-numeric: tabular-nums;
-}
-
-.rc-bg {
-  fill: #ffffff;
-}
-
-.rc-lock-bg {
-  fill: #2d6ad3;
-}
-
-.rc-lock {
-  fill: none;
-  stroke: #ffffff;
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.rc-title {
-  fill: #1d2433;
-  font: 600 12px var(--sans);
-}
-
-.rc-meta {
-  fill: #6b7487;
-  font: 400 10px var(--sans);
-}
-
-.rc-field {
-  fill: #f1f4f9;
-}
-
-.rc-plain {
-  fill: #1d2433;
-  font: 400 11px var(--mono);
-}
-
 /* ==== Home: compose and result ==================================================================================== */
 
 .compose {
@@ -5076,11 +4969,6 @@ pre.code code {
     flex: 1 1 auto;
   }
 
-  .hero-art {
-    flex-basis: 100%;
-    min-width: 0;
-    max-width: 270px;
-  }
 
   .panel,
   .state > .panel,
