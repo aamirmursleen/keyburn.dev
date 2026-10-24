@@ -1,17 +1,17 @@
 {
   "linkset": [
     {
-      "anchor": "https://secret.nafran.com/api/v1/",
+      "anchor": "https://keyburn.dev/api/v1/",
       "service-desc": [
-        { "href": "https://secret.nafran.com/openapi.json", "type": "application/vnd.oai.openapi+json" }
+        { "href": "https://keyburn.dev/openapi.json", "type": "application/vnd.oai.openapi+json" }
       ],
       "service-doc": [
-        { "href": "https://secret.nafran.com/agents", "type": "text/html" },
-        { "href": "https://secret.nafran.com/security", "type": "text/html" },
-        { "href": "https://secret.nafran.com/auth.md", "type": "text/markdown" }
+        { "href": "https://keyburn.dev/agents", "type": "text/html" },
+        { "href": "https://keyburn.dev/security", "type": "text/html" },
+        { "href": "https://keyburn.dev/auth.md", "type": "text/markdown" }
       ],
       "status": [
-        { "href": "https://secret.nafran.com/api/v1/health", "type": "application/json" }
+        { "href": "https://keyburn.dev/api/v1/health", "type": "application/json" }
       ]
     }
   ]

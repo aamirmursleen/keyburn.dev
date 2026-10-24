@@ -132,7 +132,7 @@ still be readable from another location for up to a minute.
 - Pages strip the key from the address bar on load, use `referrer: no-referrer`, wipe decrypted
   text from the page when it is left, never linkify content, sanitize downloaded file names
   (including Unicode direction overrides used to disguise extensions), and never claim that a
-  secret or request comes from One Smart Sheep (creation is public, so this prevents brand-backed
+  secret or request comes from KeyBurn (creation is public, so this prevents brand-backed
   phishing).
 - The Worker only answers on the custom domain (`workers_dev` and preview URLs are disabled), and
   plain HTTP is redirected to HTTPS.
@@ -161,7 +161,7 @@ it never reaches the AI provider's servers or chat history.
 - **Same protocol, local code.** The tool derives tokens and decrypts exactly like the browser,
   from code on the user's disk that is pinned by SHA-256 (`src/cli/release.json`). Unlike the web
   pages, a compromised server can't change the code that handles the key. It only talks to
-  `secret.nafran.com` and `secrets.nafran.com` (plus a loopback test server via `OSSS_ORIGIN`),
+  `keyburn.dev` and the original `secret.nafran.com` and `secrets.nafran.com` (plus a loopback test server via `OSSS_ORIGIN`),
   never follows redirects, caps and strictly validates every response. It doesn't use Node's
   `fetch()`: its own transport asks for uncompressed data, refuses compressed responses without
   decompressing them (so server bytes never reach zlib's decoders, as in CVE-2026-111497) and

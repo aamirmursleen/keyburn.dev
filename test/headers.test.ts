@@ -42,6 +42,12 @@ describe("security headers", () => {
     expectHardened(res.headers);
   });
 
+  it("redirects www.keyburn.dev to keyburn.dev, keeping the path", async () => {
+    const res = await fetchPage("https://www.keyburn.dev/s?x=1", { redirect: "manual" });
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("https://keyburn.dev/s?x=1");
+  });
+
   it("redirects plain HTTP to HTTPS, keeping the path", async () => {
     const res = await fetchPage("http://secret.onesmartsheep.com/s", { redirect: "manual" });
     expect(res.status).toBe(301);
@@ -124,13 +130,13 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
     }
     const robots = await (await fetchPage("https://secret.onesmartsheep.com/robots.txt")).text();
     expect(robots).toMatch(/^Content-Signal: search=yes, ai-input=yes, ai-train=no$/m);
-    expect(robots).toMatch(/^Sitemap: https:\/\/secret\.nafran\.com\/sitemap\.xml$/m);
+    expect(robots).toMatch(/^Sitemap: https:\/\/keyburn\.dev\/sitemap\.xml$/m);
     expect(robots).toMatch(/^Disallow: \/$/m);
     const catalog = await (await fetchPage("https://secret.onesmartsheep.com/.well-known/api-catalog")).json<{ linkset: Record<string, unknown>[] }>();
     expect(Object.keys(catalog.linkset[0]!)).toEqual(["anchor", "service-desc", "service-doc", "status"]);
     const ard = await (await fetchPage("https://secret.onesmartsheep.com/.well-known/ai-catalog.json")).json<{ entries: Record<string, unknown>[] }>();
     for (const entry of ard.entries) {
-      expect(entry.identifier).toMatch(/^urn:air:secret\.nafran\.com:/);
+      expect(entry.identifier).toMatch(/^urn:air:keyburn\.dev:/);
       expect("url" in entry !== "data" in entry).toBe(true);
     }
     const index = await (await fetchPage("https://secret.onesmartsheep.com/.well-known/agent-skills/index.json")).json<{

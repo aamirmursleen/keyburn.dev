@@ -1,16 +1,16 @@
 {
   "specVersion": "1.0",
   "host": {
-    "displayName": "One Smart Sheep Secret",
-    "identifier": "did:web:secret.nafran.com"
+    "displayName": "KeyBurn",
+    "identifier": "did:web:keyburn.dev"
   },
   "entries": [
     {
-      "identifier": "urn:air:secret.nafran.com:skill:osss",
-      "displayName": "Use One Smart Sheep secret links without printing them",
-      "description": "How an AI agent opens a One Smart Sheep secret link on the user's computer with the local osss CLI or MCP server, and uses the secret in a command without the value entering the conversation.",
+      "identifier": "urn:air:keyburn.dev:skill:osss",
+      "displayName": "Use KeyBurn secret links without printing them",
+      "description": "How an AI agent opens a KeyBurn secret link on the user's computer with the local osss CLI or MCP server, and uses the secret in a command without the value entering the conversation.",
       "type": "application/agent-skills+md",
-      "url": "https://secret.nafran.com/.well-known/agent-skills/osss/SKILL.md",
+      "url": "https://keyburn.dev/.well-known/agent-skills/osss/SKILL.md",
       "tags": ["secrets", "credentials", "mcp", "security"],
       "representativeQueries": [
         "open a secret link without printing the secret",
@@ -20,11 +20,11 @@
       ]
     },
     {
-      "identifier": "urn:air:secret.nafran.com:api:secrets",
-      "displayName": "One Smart Sheep Secret API",
+      "identifier": "urn:air:keyburn.dev:api:secrets",
+      "displayName": "KeyBurn API",
       "description": "Zero-knowledge API for self-destructing secrets. Clients encrypt on their own device; requests carry only ciphertext and tokens derived from a link.",
       "type": "application/vnd.oai.openapi+json",
-      "url": "https://secret.nafran.com/openapi.json",
+      "url": "https://keyburn.dev/openapi.json",
       "tags": ["secrets", "encryption", "api"],
       "representativeQueries": [
         "create an end-to-end encrypted one-time secret link",

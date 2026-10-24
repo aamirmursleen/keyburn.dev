@@ -1,8 +1,8 @@
 {
-  "name": "onesmartsheep-secret",
+  "name": "keyburn",
   "version": "1.0.0",
   "private": true,
-  "description": "Zero-knowledge, self-destructing secret sharing for One Smart Sheep, hosted entirely on Cloudflare.",
+  "description": "KeyBurn: zero-knowledge, self-destructing secret sharing on Cloudflare, with a CLI and MCP server for AI agents.",
   "type": "module",
   "engines": {
     "node": ">=22",

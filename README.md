@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://secret.nafran.com"><strong>Live demo</strong></a>
+  <a href="https://keyburn.dev"><strong>Live: keyburn.dev</strong></a>
   &nbsp;·&nbsp;
   <a href="docs/SECURITY.md"><strong>Security model</strong></a>
   &nbsp;·&nbsp;
@@ -28,7 +28,7 @@
 ---
 
 Passwords, API keys and `.env` files end up in chats, tickets and inboxes, where they stay forever.
-**keyburn** sends them as a link that works once and then burns:
+**KeyBurn** sends them as a link that works once and then burns:
 
 1. **Your browser encrypts it.** AES-256-GCM with the browser's own Web Crypto. Nothing readable leaves your device.
 2. **You share the link.** The key is the part after `#`, which browsers never send to any server.
@@ -39,7 +39,7 @@ so it can't read what you share. And with the `osss` tool, **AI agents like Clau
 secret without ever seeing it.**
 
 <p align="center">
-  <img alt="The keyburn web app: share a secret" src=".github/assets/screenshot.png" width="92%">
+  <img alt="The KeyBurn web app: share a secret" src=".github/assets/screenshot.png" width="92%">
 </p>
 
 ## ✦ Features
@@ -100,7 +100,7 @@ secret without ever seeing it.**
 sequenceDiagram
     autonumber
     participant S as Sender's browser
-    participant K as keyburn (Cloudflare Worker)
+    participant K as KeyBurn (Cloudflare Worker)
     participant R as Recipient's browser
     S->>S: Make a random key S. Derive the id, tokens and AES-256-GCM keys (HKDF)
     S->>K: Ciphertext + SHA-256 hashes of the tokens (never S)
@@ -127,7 +127,7 @@ without **seeing** it. `osss` opens the link on your computer, keeps it encrypte
 hands the agent a handle instead of the value:
 
 ```console
-$ osss open https://secret.nafran.com/s#…
+$ osss open https://keyburn.dev/s#…
 Opened. The secret is stored encrypted on this machine and was not shown.
 Handle: osss_Lq3…_v9X…
 Contains: 1 environment variable(s): CLOUDFLARE_API_TOKEN
@@ -145,20 +145,20 @@ $ osss run osss_Lq3…_v9X… -- npx wrangler deploy
   catches a pasted link, opens it locally and stops the message before it reaches the model, then
   gives you the message back with a handle in place of the link.
 - **Pinned and self-contained.** One zero-dependency file for Node.js 22+, pinned by SHA-256. It
-  talks only to the keyburn servers, never follows redirects, refuses compressed responses and
+  talks only to the KeyBurn servers, never follows redirects, refuses compressed responses and
   checks every reply.
 
 Install it and connect Claude Code (the fingerprint is pinned by the build in `src/cli/release.json`):
 
 ```sh
 (umask 077 && mkdir -p ~/.osss && cd ~/.osss && rm -f osss.download \
-  && curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.1.mjs \
-  && echo "a70edb2257f680ec7a9265aa4f0f60532dad82267cabdefd38836c702ded7087  osss.download" | shasum -a 256 -c \
+  && curl -fsSL -o osss.download https://keyburn.dev/cli/osss-1.1.0.mjs \
+  && echo "d5b88d304a32b2d5cfc604ad49e1b60b4fc420cd1162e7f475238b9fc85c8425  osss.download" | shasum -a 256 -c \
   && mv osss.download osss.mjs)
 claude mcp add --scope user osss -- node ~/.osss/osss.mjs mcp
 ```
 
-More, including Codex and the hook: **[/agents](https://secret.nafran.com/agents)**. Browser agents
+More, including Codex and the hook: **[keyburn.dev/agents](https://keyburn.dev/agents)**. Browser agents
 get a WebMCP tool to create links, and crawlers and agents find the site through `llms.txt`, an
 API catalog (RFC 9727), an OpenAPI description, an agent skill and Markdown versions of every
 public page (`Accept: text/markdown`).
@@ -241,4 +241,4 @@ not public issues. See [SECURITY.md](.github/SECURITY.md).
 No license has been chosen yet, so all rights are reserved for now: you can read and audit the code,
 but not reuse it.
 
-<p align="center"><sub>Designed and built for One Smart Sheep.</sub></p>
+<p align="center"><sub>KeyBurn is built by One Smart Sheep.</sub></p>

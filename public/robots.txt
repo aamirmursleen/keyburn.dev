@@ -1,4 +1,4 @@
-# One Smart Sheep Secret: https://secret.nafran.com
+# KeyBurn: https://keyburn.dev
 # Public pages and the documents for agents may be crawled. Secret, receipt, request and
 # inbox pages show nothing without the key in their link, and the API is not for crawling.
 
@@ -32,5 +32,5 @@ Allow: /sitemap.xml$
 Allow: /.well-known/
 Disallow: /
 
-Sitemap: https://secret.nafran.com/sitemap.xml
-Agentmap: https://secret.nafran.com/.well-known/ai-catalog.json
+Sitemap: https://keyburn.dev/sitemap.xml
+Agentmap: https://keyburn.dev/.well-known/ai-catalog.json

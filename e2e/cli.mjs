@@ -240,7 +240,7 @@ async function run(browser) {
   assert.match(decision.reason, /Deploy with osss_[A-Za-z0-9_-]{16}_[A-Za-z0-9_-]{43} \(osss handle; variables: HOOK_TOKEN\), thanks/);
   const viaHook = await osss(["run", hookHandle, "--", process.execPath, "-e", "console.log(process.env.HOOK_TOKEN.length)"]);
   assert.equal(viaHook.stdout, "23\n");
-  const passThrough = await osss(["hook", "claude-code"], { input: JSON.stringify({ prompt: "no links here, see https://secret.nafran.com/agents" }) });
+  const passThrough = await osss(["hook", "claude-code"], { input: JSON.stringify({ prompt: "no links here, see https://keyburn.dev/agents" }) });
   assert.deepEqual([passThrough.code, passThrough.stdout], [0, ""], "prompts without links pass with no output");
 
   // ---- 8. WebMCP: a browser agent creates a link with the page's own encryption ---------

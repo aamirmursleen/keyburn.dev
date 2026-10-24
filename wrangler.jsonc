@@ -13,6 +13,9 @@
   "workers_dev": false,
   "preview_urls": false,
   "routes": [
+    { "pattern": "keyburn.dev", "custom_domain": true },
+    { "pattern": "www.keyburn.dev", "custom_domain": true },
+    // The first hosts, kept so links created on them keep working.
     { "pattern": "secret.nafran.com", "custom_domain": true },
     { "pattern": "secrets.nafran.com", "custom_domain": true }
   ],

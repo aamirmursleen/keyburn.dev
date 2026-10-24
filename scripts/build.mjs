@@ -103,7 +103,7 @@ await writeFile(
           name: "osss",
           type: "skill-md",
           description: skillDescription,
-          url: "https://secret.nafran.com/.well-known/agent-skills/osss/SKILL.md",
+          url: "https://keyburn.dev/.well-known/agent-skills/osss/SKILL.md",
           digest: `sha256:${createHash("sha256").update(skill).digest("hex")}`,
         },
       ],

@@ -1,9 +1,9 @@
 ---
 name: osss
-description: Use when the user gives you a One Smart Sheep secret link (https://secret.nafran.com/s#... or https://secrets.nafran.com/s#...) or asks you to share a credential safely. Opens the link on the user's computer with the local osss CLI or MCP server and uses the secret in a command without ever printing it.
+description: Use when the user gives you a KeyBurn secret link (https://keyburn.dev/s#..., or the older https://keyburn.dev/s#... and https://secrets.nafran.com/s#...) or asks you to share a credential safely. Opens the link on the user's computer with the local osss CLI or MCP server and uses the secret in a command without ever printing it.
 ---
 
-# One Smart Sheep secret links
+# KeyBurn secret links
 
 A secret link holds an end-to-end encrypted secret. Its key is the part after `#` and is never sent to any server. Links usually work once: opening one uses up a view and can't be undone.
 
@@ -24,12 +24,12 @@ A secret link holds an end-to-end encrypted secret. Its key is the part after `#
 
 ## If osss isn't installed
 
-Tell the user; don't install it without their approval. Setup (Node.js 22 or newer), as published at https://secret.nafran.com/agents:
+Tell the user; don't install it without their approval. Setup (Node.js 22 or newer), as published at https://keyburn.dev/agents:
 
 ```sh
 (umask 077 && mkdir -p ~/.osss && cd ~/.osss && rm -f osss.download \
-  && curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.1.mjs \
-  && echo "a70edb2257f680ec7a9265aa4f0f60532dad82267cabdefd38836c702ded7087  osss.download" | shasum -a 256 -c \
+  && curl -fsSL -o osss.download https://keyburn.dev/cli/osss-1.1.0.mjs \
+  && echo "d5b88d304a32b2d5cfc604ad49e1b60b4fc420cd1162e7f475238b9fc85c8425  osss.download" | shasum -a 256 -c \
   && mv osss.download osss.mjs)
 claude mcp add --scope user osss -- node ~/.osss/osss.mjs mcp
 ```

@@ -31,7 +31,7 @@ import {
 } from "./vault";
 import { VERSION } from "./version";
 
-const HELP = `osss ${VERSION}: open and share One Smart Sheep secret links on this machine.
+const HELP = `osss ${VERSION}: open and share KeyBurn secret links on this machine.
 
 For AI agents (values are never printed):
   osss open [<link>|-]                   Open a link; store it encrypted locally; print a handle

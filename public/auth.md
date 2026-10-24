@@ -1,12 +1,12 @@
-# One Smart Sheep Secret auth.md
+# KeyBurn auth.md
 
 ## For agents in one paragraph
 
-There is nothing to register and no credential to obtain: no accounts, API keys, OAuth or client registration. Every operation is authorized by a capability that the client derives from a link. The part of a link after `#` must never be sent to any server, including this one, so use the local `osss` tool (https://secret.nafran.com/agents), which does the derivation and decryption on the user's computer.
+There is nothing to register and no credential to obtain: no accounts, API keys, OAuth or client registration. Every operation is authorized by a capability that the client derives from a link. The part of a link after `#` must never be sent to any server, including this one, so use the local `osss` tool (https://keyburn.dev/agents), which does the derivation and decryption on the user's computer.
 
 ## Audience
 
-AI agents and scripts that open, create, check or revoke One Smart Sheep secret links on behalf of a person.
+AI agents and scripts that open, create, check or revoke KeyBurn secret links on behalf of a person.
 
 ## Registration and provisioning
 

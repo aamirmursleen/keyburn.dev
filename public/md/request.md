@@ -1,4 +1,4 @@
-# Request a secret · One Smart Sheep Secret
+# Request a secret · KeyBurn
 
 Ask someone to send you a password, API key or file, so that only you can open it.
 
@@ -8,4 +8,4 @@ Ask someone to send you a password, API key or file, so that only you can open i
 
 Requests expire after 1 hour to 7 days. An answer is kept for up to 7 days or until you open it. You can add a short note, which is encrypted too.
 
-Create a request in a browser: https://secret.nafran.com/request
+Create a request in a browser: https://keyburn.dev/request

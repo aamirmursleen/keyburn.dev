@@ -1,4 +1,4 @@
-# One Smart Sheep Secret
+# KeyBurn
 
 > Zero-knowledge, self-destructing secret sharing. Secrets are encrypted on the sender's device, the key lives in the link after "#" and never reaches the server, and each secret is deleted after its last view or when it expires.
 
@@ -6,13 +6,13 @@ AI agents: never open a secret link with a web-fetch tool or paste it into anoth
 
 ## Docs
 
-- [How it works](https://secret.nafran.com/security.md): encryption, what the server stores, and the limits of the design
-- [For AI agents](https://secret.nafran.com/agents.md): the osss CLI and MCP server, which open secret links locally without printing them
-- [Agent skill](https://secret.nafran.com/.well-known/agent-skills/osss/SKILL.md): rules and steps for an agent handling a secret link
-- [Authentication](https://secret.nafran.com/auth.md): no accounts or API keys; a link is the capability
-- [API description](https://secret.nafran.com/openapi.json): OpenAPI 3.1; every value is produced by client-side cryptography
+- [How it works](https://keyburn.dev/security.md): encryption, what the server stores, and the limits of the design
+- [For AI agents](https://keyburn.dev/agents.md): the osss CLI and MCP server, which open secret links locally without printing them
+- [Agent skill](https://keyburn.dev/.well-known/agent-skills/osss/SKILL.md): rules and steps for an agent handling a secret link
+- [Authentication](https://keyburn.dev/auth.md): no accounts or API keys; a link is the capability
+- [API description](https://keyburn.dev/openapi.json): OpenAPI 3.1; every value is produced by client-side cryptography
 
 ## Pages
 
-- [Share a secret](https://secret.nafran.com/index.md): create a self-destructing link in the browser
-- [Request a secret](https://secret.nafran.com/request.md): ask someone to send you a secret that only you can open
+- [Share a secret](https://keyburn.dev/index.md): create a self-destructing link in the browser
+- [Request a secret](https://keyburn.dev/request.md): ask someone to send you a secret that only you can open

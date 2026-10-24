@@ -1,4 +1,4 @@
-# For AI agents · One Smart Sheep Secret
+# For AI agents · KeyBurn
 
 ## Let your AI agent use a secret without seeing it
 
@@ -15,8 +15,8 @@ Needs Node.js 22 or newer, kept up to date (at least 22.23.4, 24.22.1 or 26.12.1
 
 ```sh
 (umask 077 && mkdir -p ~/.osss && cd ~/.osss && rm -f osss.download \
-  && curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.1.mjs \
-  && echo "a70edb2257f680ec7a9265aa4f0f60532dad82267cabdefd38836c702ded7087  osss.download" | shasum -a 256 -c \
+  && curl -fsSL -o osss.download https://keyburn.dev/cli/osss-1.1.0.mjs \
+  && echo "d5b88d304a32b2d5cfc604ad49e1b60b4fc420cd1162e7f475238b9fc85c8425  osss.download" | shasum -a 256 -c \
   && mv osss.download osss.mjs)
 ```
 
@@ -30,7 +30,7 @@ On Linux, use `sha256sum -c` instead of `shasum -a 256 -c`. Use the file only if
 
 ## Use it
 
-Paste a link and say what it's for, for example "Deploy with the token in this link: https://secret.nafran.com/s#…". The agent opens it once and then runs, for example:
+Paste a link and say what it's for, for example "Deploy with the token in this link: https://keyburn.dev/s#…". The agent opens it once and then runs, for example:
 
 ```sh
 osss run osss_AbC…_xYz… -- npx wrangler deploy
@@ -66,7 +66,7 @@ Give your agent only the handle it prints. Secrets with a passphrase always work
 
 - **Kept out of the conversation.** Tool results contain a handle and variable names, never values, so the secret isn't sent to your AI provider or kept in chat history.
 - **Never stored in plain text.** Each local copy is encrypted with its own key, and that key exists only inside the handle. An attached file is written to a private temporary folder only while a command runs.
-- **Talks to two servers only.** osss only connects to secret.nafran.com and secrets.nafran.com, never follows redirects and checks every response. Its code runs from your disk, so a compromised server can't change it.
+- **Talks to KeyBurn only.** osss only connects to keyburn.dev (and the original secret.nafran.com and secrets.nafran.com addresses), never follows redirects and checks every response. Its code runs from your disk, so a compromised server can't change it.
 - **Not a sandbox.** An agent that runs commands as you could still misuse a secret it's allowed to use, for example by running a command that prints it. osss tells agents never to do this and redacts exact matches from output, but only give secrets to agents you trust with that access.
 - **Links in chats.** Without the hook, a pasted link is part of that conversation, so keep secrets to one view (the default): the link is useless once your agent has opened it. A handle in a chat is useless without the encrypted copy on your computer.
 

@@ -9,7 +9,7 @@ export const SUPPORTED_PROTOCOLS = ["2025-11-25", "2025-06-18", "2025-03-26", "2
 const MAX_MESSAGE_BYTES = 1024 * 1024;
 
 export const INSTRUCTIONS = [
-  "osss opens end-to-end encrypted secret links (https://secret.nafran.com/s#... and https://secrets.nafran.com/s#...) on this machine without the value entering the conversation.",
+  "osss opens end-to-end encrypted KeyBurn secret links (https://keyburn.dev/s#..., or the older https://secret.nafran.com/s#... and https://secrets.nafran.com/s#...) on this machine without the value entering the conversation.",
   "Rules you must follow:",
   "1. Never print, echo, quote, summarise, encode or paste a secret's value, a passphrase or an attached file's contents into the conversation, a commit, a log, a file or another tool, and never run commands whose purpose is to show them (printenv, env, echo $VAR, cat \"$OSSS_SECRET_FILE\", ...). Output redaction is only a safety net.",
   "2. Use a secret only through `osss run <handle> -- <command> [args...]` (the runCommand that open_secret returns). It passes the secret to that one command as environment variables (or OSSS_SECRET, and an attached file as OSSS_SECRET_FILE).",
@@ -43,7 +43,7 @@ const TOOLS = [
     name: "open_secret",
     title: "Open a secret link",
     description:
-      "Opens a secret link (https://secret.nafran.com/s#... or https://secrets.nafran.com/s#...) on this machine and stores it encrypted for local use. Returns a handle, never the value. This uses up one view of the link. Use the value only through the returned run command.",
+      "Opens a KeyBurn secret link (https://keyburn.dev/s#..., or the older secret.nafran.com and secrets.nafran.com links) on this machine and stores it encrypted for local use. Returns a handle, never the value. This uses up one view of the link. Use the value only through the returned run command.",
     inputSchema: {
       type: "object",
       properties: { link: { type: "string", description: "The full secret link, including the part after #.", maxLength: 512 } },
@@ -131,7 +131,7 @@ export async function handleMessage(deps: McpDeps, message: unknown): Promise<Js
         result: {
           protocolVersion,
           capabilities: { tools: { listChanged: false } },
-          serverInfo: { name: "osss", title: "One Smart Sheep secrets", version: VERSION },
+          serverInfo: { name: "osss", title: "KeyBurn secrets", version: VERSION },
           instructions: INSTRUCTIONS,
         },
       };

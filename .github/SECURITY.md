@@ -1,6 +1,6 @@
 # Security policy
 
-keyburn is built so that the server never sees secrets, keys or passphrases. The design and its
+KeyBurn is built so that the server never sees secrets, keys or passphrases. The design and its
 limits are described in [docs/SECURITY.md](../docs/SECURITY.md).
 
 ## Reporting a vulnerability

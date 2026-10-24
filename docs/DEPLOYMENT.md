@@ -23,13 +23,14 @@ npm run build && npm run e2e   # Playwright end-to-end runs (browser, then CLI a
 
 ## Current deployment
 
-- **Live at https://secret.nafran.com and https://secrets.nafran.com** (two custom domains on
-  the same Worker; links point to whichever host they were created on): Worker `osss-secret`,
+- **Live at https://keyburn.dev** (`www.keyburn.dev` redirects to it). The first hosts,
+  `secret.nafran.com` and `secrets.nafran.com`, stay on the same Worker so links created there keep
+  working; links point to whichever host they were created on. Worker `osss-secret`,
   R2 bucket `osss-secret-files` (9-day safety-net lifecycle rule), secret `IP_HASH_SECRET` set.
   The Cloudflare account is taken from `CLOUDFLARE_ACCOUNT_ID` in the gitignored `.env` file.
 - Redeploy after changes with `npm run deploy` (type checks, tests, build and the browser test
   run first). Smoke-test production with
-  `E2E_BASE=https://secret.nafran.com npm run e2e`.
+  `E2E_BASE=https://keyburn.dev npm run e2e`.
 - Pages are served with `Cache-Control: no-store, no-transform`, so Cloudflare zone features
   (Web Analytics auto-injection, Email Obfuscation, Rocket Loader) can't inject scripts, even
   when the zone has Web Analytics injection turned on.
@@ -37,12 +38,6 @@ npm run build && npm run e2e   # Playwright end-to-end runs (browser, then CLI a
   `X-Frame-Options` to `SAMEORIGIN` and `Referrer-Policy` to `same-origin` on responses.
   Framing is still blocked by CSP `frame-ancestors 'none'`, and pages and requests set
   `no-referrer` themselves. To restore the exact headers, turn that transform off for the zone.
-
-### Moving to secret.onesmartsheep.com later
-
-The `onesmartsheep.com` zone lives in a different Cloudflare account. R2 must first be enabled there
-(dashboard → R2 Object Storage). Then set `CLOUDFLARE_ACCOUNT_ID` in `.env` and the route in `wrangler.jsonc` and
-follow the steps below.
 
 ## Deployment
 
@@ -64,9 +59,9 @@ The Worker must be deployed into the Cloudflare account that owns the target zon
    ```bash
    npm run deploy
    ```
-   This creates the `secret.onesmartsheep.com` custom domain, DNS record and certificate automatically.
-5. In the Cloudflare dashboard for `onesmartsheep.com`, make sure nothing injects scripts into
-   this hostname: **Rocket Loader off, Email Address Obfuscation off, Web Analytics automatic
+   This creates the custom domains listed in `wrangler.jsonc`, with their DNS records and certificates.
+5. In the Cloudflare dashboard for the zone, make sure nothing injects scripts into this
+   hostname: **Rocket Loader off, Email Address Obfuscation off, Web Analytics automatic
    setup off (or excluded for this hostname), no Zaraz.** The CSP (pinned to the app's own
    files) blocks injected scripts anyway, but they would produce errors. Keep **Always Use
    HTTPS** on.
@@ -98,9 +93,9 @@ Rate-limit `namespace_id`s (71001–71003) must be unique within the Cloudflare 
   using Zod, to keep third-party code out of a security-critical service. All crypto is native
   WebCrypto.
 - **Creation is public** (no login), as requested. Abuse is bounded by rate limits, daily quotas
-  and wording that never presents content as coming from One Smart Sheep. To restrict creation to
-  the team later, put Cloudflare Access (Google login for @onesmartsheep.com) in front of `/`,
-  `/request` and `/api/v1/*/create`.
+  and wording that never presents content as coming from KeyBurn. To restrict creation to
+  a team later, put Cloudflare Access (for example a Google login for the team's domain) in front
+  of `/`, `/request` and `/api/v1/*/create`.
 - **Durable Objects, not KV**, because one-time secrets need strong consistency.
 
 ## Follow-ups
@@ -109,8 +104,8 @@ Rate-limit `namespace_id`s (71001–71003) must be unique within the Cloudflare 
 - Not offered on purpose: an MCP Server Card (the format describes remote MCP servers, and a
   remote server that handled links would see their keys), OAuth discovery and protected-resource
   metadata (there is no OAuth: links are the capability, see `/auth.md`), and DNS-AID records.
-- HSTS preload would have to be enabled on the apex `onesmartsheep.com` (it then covers every
-  subdomain), so it's a whole-domain decision. Only do it once every subdomain is HTTPS-only.
+- `keyburn.dev` is HTTPS-only by design: the whole `.dev` top-level domain is on the browsers' HSTS
+  preload list.
 - Optional: keep data in the EU by using a Durable Object jurisdiction
   (`env.VAULT.jurisdiction("eu")`) and an EU R2 bucket.
 - Protect the Cloudflare account with hardware-key 2FA. Whoever can deploy this Worker could

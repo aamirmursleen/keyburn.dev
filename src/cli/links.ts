@@ -1,8 +1,8 @@
 import { b64urlDecode, b64urlEncode, isB64url, type Bytes } from "../shared/encoding";
 import { CliError } from "./errors";
 
-/** The only servers the tool talks to. */
-export const DEFAULT_ORIGINS: readonly string[] = ["https://secret.nafran.com", "https://secrets.nafran.com"];
+/** The only servers the tool talks to: KeyBurn, and its first two hosts so older links keep working. */
+export const DEFAULT_ORIGINS: readonly string[] = ["https://keyburn.dev", "https://secret.nafran.com", "https://secrets.nafran.com"];
 
 /**
  * Trusted origins. Configuration may add one loopback origin for local testing; a link can
@@ -58,7 +58,7 @@ function locate(input: string, origins: readonly string[], path: string): { orig
     throw new CliError("bad_link", "That isn't a complete link. Copy the whole link, including everything after #.");
   }
   if (!origins.includes(url.origin) || url.username || url.password) {
-    throw new CliError("untrusted_origin", "Only links from secret.nafran.com or secrets.nafran.com are accepted.");
+    throw new CliError("untrusted_origin", "Only links from keyburn.dev (or the older secret.nafran.com and secrets.nafran.com) are accepted.");
   }
   if (url.pathname !== path || url.search) {
     throw new CliError("bad_link", "That isn't the right kind of link for this command.");

@@ -1,16 +1,19 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "One Smart Sheep Secret API",
+    "title": "KeyBurn API",
     "version": "1.0.0",
     "summary": "Zero-knowledge API for self-destructing secrets and secret requests.",
-    "description": "Every value sent to this API is produced by client-side cryptography (protocol osss/v1): secrets are encrypted on the sender's device with AES-256-GCM, and only ciphertext, sizes and hashes of link-derived tokens reach the server. Links carry their key after '#', which must never be sent to any server, including this one.\n\nAI agents should not call this API directly: use the local osss tool (https://secret.nafran.com/agents), which implements the protocol and never prints secrets. The protocol is implemented by the reference client osss (versioned downloads under https://secret.nafran.com/cli/, listed in SHA256SUMS) and described at https://secret.nafran.com/security.\n\nThere is no authentication: possession of a link is the authorization (see https://secret.nafran.com/auth.md). Requests from browsers must be same-origin. Limits per client IP: 10 creations, 60 reads and 10 uploads per minute, plus daily quotas."
+    "description": "Every value sent to this API is produced by client-side cryptography (protocol osss/v1): secrets are encrypted on the sender's device with AES-256-GCM, and only ciphertext, sizes and hashes of link-derived tokens reach the server. Links carry their key after '#', which must never be sent to any server, including this one.\n\nAI agents should not call this API directly: use the local osss tool (https://keyburn.dev/agents), which implements the protocol and never prints secrets. The protocol is implemented by the reference client osss (versioned downloads under https://keyburn.dev/cli/, listed in SHA256SUMS) and described at https://keyburn.dev/security.\n\nThere is no authentication: possession of a link is the authorization (see https://keyburn.dev/auth.md). Requests from browsers must be same-origin. Limits per client IP: 10 creations, 60 reads and 10 uploads per minute, plus daily quotas."
   },
   "externalDocs": {
     "description": "For AI agents",
-    "url": "https://secret.nafran.com/agents"
+    "url": "https://keyburn.dev/agents"
   },
   "servers": [
+    {
+      "url": "https://keyburn.dev/api/v1"
+    },
     {
       "url": "https://secret.nafran.com/api/v1"
     },

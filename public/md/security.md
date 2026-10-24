@@ -1,4 +1,4 @@
-# How your secrets stay secret · One Smart Sheep Secret
+# How your secrets stay secret · KeyBurn
 
 We built this so that nobody, including us and our hosting provider, can read what you share.
 
@@ -40,7 +40,7 @@ Encrypted data, its padded size, timestamps, the country a secret was opened fro
 
 ## What no website can protect against
 
-A compromised device or a malicious browser extension can read anything you see. Sending the link and the passphrase in the same message weakens the second lock. Anyone who gets the full link before your recipient can open it, which your receipt will show. The pages' code comes from this server each time, so if the server were taken over it could serve changed code to browsers; the `osss` tool for agents runs from your own disk instead (https://secret.nafran.com/agents).
+A compromised device or a malicious browser extension can read anything you see. Sending the link and the passphrase in the same message weakens the second lock. Anyone who gets the full link before your recipient can open it, which your receipt will show. The pages' code comes from this server each time, so if the server were taken over it could serve changed code to browsers; the `osss` tool for agents runs from your own disk instead (https://keyburn.dev/agents).
 
 ## Good habits
 

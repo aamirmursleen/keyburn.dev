@@ -1,11 +1,11 @@
-# One Smart Sheep Secret: share passwords that self-destruct
+# KeyBurn: share passwords that self-destruct
 
 Share passwords, API keys and files through links that delete themselves. Everything is encrypted on your device before it is sent, and the key stays in the link, so the server only ever stores encrypted data.
 
-- [Share a secret](https://secret.nafran.com/) (in a browser: encryption runs on your device)
-- [Request a secret](https://secret.nafran.com/request) from someone else
-- [How it works](https://secret.nafran.com/security) and what it protects
-- [For AI agents](https://secret.nafran.com/agents): let an agent use a secret without seeing it
+- [Share a secret](https://keyburn.dev/) (in a browser: encryption runs on your device)
+- [Request a secret](https://keyburn.dev/request) from someone else
+- [How it works](https://keyburn.dev/security) and what it protects
+- [For AI agents](https://keyburn.dev/agents): let an agent use a secret without seeing it
 
 ## How it works
 
@@ -24,4 +24,4 @@ Share passwords, API keys and files through links that delete themselves. Everyt
 
 ## For AI agents
 
-Don't open a secret link with a web-fetch tool: the page can't decrypt anything without JavaScript and the key, and fetching it never reveals the secret. Use the local `osss` tool (a CLI and MCP server) instead. It opens links on the user's computer and gives you a handle, never the value. Setup: https://secret.nafran.com/agents
+Don't open a secret link with a web-fetch tool: the page can't decrypt anything without JavaScript and the key, and fetching it never reveals the secret. Use the local `osss` tool (a CLI and MCP server) instead. It opens links on the user's computer and gives you a handle, never the value. Setup: https://keyburn.dev/agents

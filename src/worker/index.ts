@@ -136,6 +136,11 @@ async function serveStatic(request: Request, env: Env, url: URL): Promise<Respon
 export default {
   async fetch(request, env, ctx): Promise<Response> {
     const url = new URL(request.url);
+    if (url.hostname === "www.keyburn.dev") {
+      url.hostname = "keyburn.dev";
+      url.protocol = "https:";
+      return harden(Response.redirect(url.toString(), 301), "api", url);
+    }
     if (url.protocol === "http:" && !isLocal(url.hostname)) {
       url.protocol = "https:";
       return harden(Response.redirect(url.toString(), 301), "api", url);

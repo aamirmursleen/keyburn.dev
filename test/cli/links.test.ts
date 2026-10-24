@@ -42,6 +42,7 @@ describe("trustedOrigins", () => {
 
 describe("parseSecretLink", () => {
   it("accepts links from the trusted hosts", () => {
+    expect(parseSecretLink(`https://keyburn.dev/s#${KEY}`, DEFAULT_ORIGINS).origin).toBe("https://keyburn.dev");
     const parsed = parseSecretLink(`https://secret.nafran.com/s#${KEY}`, DEFAULT_ORIGINS);
     expect(parsed.origin).toBe("https://secret.nafran.com");
     expect(parsed.S).toEqual(S);
@@ -52,6 +53,8 @@ describe("parseSecretLink", () => {
   it("rejects other hosts, schemes and credentials", () => {
     for (const link of [
       `https://evil.example/s#${KEY}`,
+      `https://www.keyburn.dev/s#${KEY}`,
+      `https://keyburn.dev.evil.example/s#${KEY}`,
       `http://secret.nafran.com/s#${KEY}`,
       `https://secret.nafran.com.evil.example/s#${KEY}`,
       `https://user:pw@secret.nafran.com/s#${KEY}`,
@@ -86,6 +89,7 @@ describe("parseReceiptLink", () => {
   const token = b64urlEncode(new Uint8Array(32).fill(2));
 
   it("accepts a receipt link", () => {
+    expect(parseReceiptLink(links.receipt("https://keyburn.dev", id, token), DEFAULT_ORIGINS).origin).toBe("https://keyburn.dev");
     expect(parseReceiptLink(links.receipt("https://secret.nafran.com", id, token), DEFAULT_ORIGINS)).toEqual({
       origin: "https://secret.nafran.com",
       id,
