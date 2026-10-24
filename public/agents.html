@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="osss lets Claude Code and other AI agents use a shared secret on your computer without the value ever entering the conversation.">
+  <title>For AI agents · One Smart Sheep Secret</title>
+  <link rel="canonical" href="https://secret.nafran.com/agents">
+  <link rel="alternate" type="text/markdown" href="/agents.md">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="static">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Share</a>
+      <a href="/request">Request</a>
+      <a href="/security">How it works</a>
+      <a href="/agents" aria-current="page">For agents</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <h1>Let your AI agent use a secret without seeing it</h1>
+      <p class="lede">osss is a small command-line tool and MCP server for Claude Code, Codex and other agents. It opens secret links on your own computer, keeps them encrypted there and gives the agent a handle instead of the value. The agent passes the secret straight to the program that needs it, so it never appears in the conversation.</p>
+      <ul class="features">
+        <li>
+          <h2>1. Paste a link</h2>
+          <p>Give your agent a secret link and say what it's for. With the MCP server installed, it calls <code>open_secret</code>.</p>
+        </li>
+        <li>
+          <h2>2. Opened on your computer</h2>
+          <p>osss decrypts the secret locally with the same protocol as the browser. The key in the link is never sent to the server.</p>
+        </li>
+        <li>
+          <h2>3. A handle, not the value</h2>
+          <p>The secret is stored encrypted in <code>~/.osss</code>. The agent gets a handle such as <code>osss_…</code>, which only works on this computer.</p>
+        </li>
+        <li>
+          <h2>4. Used, then forgotten</h2>
+          <p>The agent runs <code>osss run &lt;handle&gt; -- &lt;command&gt;</code>: the command gets the secret in its environment and its output is redacted. Local copies expire after 24 hours.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Install</h2>
+      <p class="muted">Needs Node.js 22 or newer. Download the release, check its fingerprint, and only then put it in place:</p>
+      <pre class="code"><code>(umask 077 &amp;&amp; mkdir -p ~/.osss &amp;&amp; cd ~/.osss &amp;&amp; rm -f osss.download \
+  &amp;&amp; curl -fsSL -o osss.download https://secret.nafran.com/cli/osss-1.0.0.mjs \
+  &amp;&amp; echo "e4eba54de32d6b275ea96919b389a58cca8fc4431112ee84b2ad5ca8fdeb7d27  osss.download" | shasum -a 256 -c \
+  &amp;&amp; mv osss.download osss.mjs)</code></pre>
+      <p class="hint">On Linux, use <code>sha256sum -c</code> instead of <code>shasum -a 256 -c</code>. Use the file only if the check prints OK. The fingerprint is what you are trusting: if you can, compare it with one you got another way (for example from the person who set this up), not only with this page.</p>
+
+      <h2>Connect your agent</h2>
+      <p class="muted">Claude Code:</p>
+      <pre class="code"><code>claude mcp add --scope user osss -- node ~/.osss/osss.mjs mcp</code></pre>
+      <p class="muted">Codex:</p>
+      <pre class="code"><code>codex mcp add osss -- node ~/.osss/osss.mjs mcp</code></pre>
+      <p class="muted">Other MCP clients: run <code>node /full/path/to/.osss/osss.mjs mcp</code> as a stdio server. Agents without MCP can use the same commands in a shell.</p>
+    </section>
+
+    <section class="card">
+      <h2>Use it</h2>
+      <p class="muted">Paste a link and say what it's for, for example "Deploy with the token in this link: https://secret.nafran.com/s#…". The agent opens it once and then runs, for example:</p>
+      <pre class="code"><code>osss run osss_AbC…_xYz… -- npx wrangler deploy</code></pre>
+      <p class="muted">A secret written as <code>KEY=value</code> lines becomes those environment variables; anything else becomes <code>OSSS_SECRET</code>, and an attached file is passed as a path in <code>OSSS_SECRET_FILE</code>. Names that change how programs run, such as <code>PATH</code>, <code>NODE_OPTIONS</code>, <code>LD_PRELOAD</code>, proxy and certificate settings, are never exported.</p>
+
+      <h2>Keep links out of the chat</h2>
+      <p class="muted">A link you paste into a chat is sent to your AI provider with the message. In Claude Code, this hook in <code>~/.claude/settings.json</code> stops that: when a message contains a secret link, osss opens the link on your computer and holds the message back, then gives you the same message with a handle in place of the link (also on your clipboard) to send instead. Other messages are untouched.</p>
+      <pre class="code"><code>{
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "node \"$HOME/.osss/osss.mjs\" hook claude-code", "timeout": 300, "onFailure": "block" }] }
+    ]
+  }
+}</code></pre>
+      <p class="hint"><code>onFailure</code> (Claude Code 2.1.295 or newer) also holds the message back if the hook can't run at all.</p>
+      <p class="muted">With any agent, you can also open the link yourself in a terminal. osss asks for it without showing it, and for the passphrase the same way if there is one:</p>
+      <pre class="code"><code>node ~/.osss/osss.mjs open</code></pre>
+      <p class="muted">Give your agent only the handle it prints. Secrets with a passphrase always work this way: agents never see or ask for passphrases.</p>
+    </section>
+
+    <section class="card">
+      <h2>What it protects, and what it can't</h2>
+      <ul class="features">
+        <li>
+          <h2>Kept out of the conversation</h2>
+          <p>Tool results contain a handle and variable names, never values, so the secret isn't sent to your AI provider or kept in chat history.</p>
+        </li>
+        <li>
+          <h2>Never stored in plain text</h2>
+          <p>Each local copy is encrypted with its own key, and that key exists only inside the handle. An attached file is written to a private temporary folder only while a command runs.</p>
+        </li>
+        <li>
+          <h2>Talks to two servers only</h2>
+          <p>osss only connects to secret.nafran.com and secrets.nafran.com, never follows redirects and checks every response. Its code runs from your disk, so a compromised server can't change it.</p>
+        </li>
+        <li>
+          <h2>Not a sandbox</h2>
+          <p>An agent that runs commands as you could still misuse a secret it's allowed to use, for example by running a command that prints it. osss tells agents never to do this and redacts exact matches from output, but only give secrets to agents you trust with that access.</p>
+        </li>
+        <li>
+          <h2>Links in chats</h2>
+          <p>Without the hook, a pasted link is part of that conversation, so keep secrets to one view (the default): the link is useless once your agent has opened it. A handle in a chat is useless without the encrypted copy on your computer.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Commands</h2>
+      <pre class="code"><code>osss open [link|-]               open a link, print a handle (never the value)
+osss run &lt;handle&gt; -- &lt;command&gt;   run a command with the secret in its environment
+osss list                        list local copies (ids and expiry only)
+osss forget &lt;handle&gt; | --all     delete local copies
+osss reveal &lt;handle&gt;             show the value (interactive terminal only)
+osss send                        create a link from standard input or --file
+osss status | revoke &lt;receipt&gt;   check or destroy a secret you sent
+osss mcp                         run the MCP server
+osss hook claude-code            keep pasted links out of Claude Code chats</code></pre>
+      <p class="hint">In these examples <code>osss</code> means <code>node ~/.osss/osss.mjs</code>.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Encrypted on your device · Self-destructing · No accounts, cookies or tracking · <a href="/security">How it works</a></p>
+  </footer>
+</body>
+</html>

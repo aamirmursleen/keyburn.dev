@@ -1,0 +1,36 @@
+# One Smart Sheep Secret: https://secret.nafran.com
+# Public pages and the documents for agents may be crawled. Secret, receipt, request and
+# inbox pages show nothing without the key in their link, and the API is not for crawling.
+
+# Crawlers that collect AI training data.
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: meta-externalagent
+Content-Signal: search=no, ai-input=no, ai-train=no
+Disallow: /
+
+# Everyone else, including search engines and agents acting for a person.
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /$
+Allow: /request$
+Allow: /security$
+Allow: /agents$
+Allow: /index.md$
+Allow: /request.md$
+Allow: /security.md$
+Allow: /agents.md$
+Allow: /llms.txt$
+Allow: /auth.md$
+Allow: /openapi.json$
+Allow: /sitemap.xml$
+Allow: /.well-known/
+Disallow: /
+
+Sitemap: https://secret.nafran.com/sitemap.xml
+Agentmap: https://secret.nafran.com/.well-known/ai-catalog.json

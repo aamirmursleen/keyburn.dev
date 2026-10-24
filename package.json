@@ -1,0 +1,43 @@
+{
+  "name": "onesmartsheep-secret",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zero-knowledge, self-destructing secret sharing for One Smart Sheep, hosted entirely on Cloudflare.",
+  "type": "module",
+  "engines": {
+    "node": ">=22",
+    "npm": ">=11.19.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "npm run build && OSSS_DEV=1 wrangler dev --port 8787 --local-upstream localhost:8787",
+    "test": "vitest run && vitest run -c vitest.cli.config.ts",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage && vitest run -c vitest.cli.config.ts --coverage",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.client.json && tsc --noEmit -p tsconfig.cli.json && tsc --noEmit -p test/tsconfig.json && tsc --noEmit -p test/cli/tsconfig.json",
+    "types": "wrangler types src/worker/worker-configuration.d.ts",
+    "e2e": "node e2e/run.mjs && node e2e/cli.mjs",
+    "check": "npm run typecheck && npm run test:coverage && npm run build:verify",
+    "deploy": "npm run check && npm run e2e && env -u OSSS_DEV wrangler deploy",
+    "build:verify": "node scripts/build.mjs --verify-release"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.4.7",
+    "@types/node": "22.20.5",
+    "@vitest/coverage-istanbul": "5.0.5",
+    "esbuild": "0.28.2",
+    "playwright": "1.63.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5",
+    "wrangler": "4.152.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261019.1": true,
+    "fsevents": false
+  },
+  "overrides": {
+    "undici": "7.30.1",
+    "zod": "4.6.7"
+  }
+}

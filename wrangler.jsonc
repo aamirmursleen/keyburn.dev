@@ -1,0 +1,64 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "osss-secret",
+  // The Cloudflare account comes from CLOUDFLARE_ACCOUNT_ID (put it in the gitignored .env file),
+  // so it isn't published. To move to another domain, switch that account and the routes below.
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-10-19",
+  // Rebuild the browser bundle from source on every wrangler deploy/dev, so a stale
+  // public/assets/app.js can never be uploaded.
+  "build": { "command": "node scripts/build.mjs --verify-release" },
+  // Only reachable on the custom domain: no *.workers.dev or preview URLs that
+  // could bypass the zone's settings.
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "secret.nafran.com", "custom_domain": true },
+    { "pattern": "secrets.nafran.com", "custom_domain": true }
+  ],
+
+  // Every request goes through the Worker so security headers are always applied.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "html_handling": "none",
+    "not_found_handling": "none"
+  },
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "VAULT", "class_name": "Vault" },
+      { "name": "QUOTA", "class_name": "Quota" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Vault", "Quota"] }],
+
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "osss-secret-files" }],
+
+  // Burst limits per client IP (IPv6 grouped by /64), per Cloudflare location.
+  "ratelimits": [
+    { "name": "RL_CREATE", "namespace_id": "71001", "simple": { "limit": 10, "period": 60 } },
+    { "name": "RL_ACCESS", "namespace_id": "71002", "simple": { "limit": 60, "period": 60 } },
+    { "name": "RL_UPLOAD", "namespace_id": "71003", "simple": { "limit": 10, "period": 60 } }
+  ],
+
+  // Daily quotas, enforced strictly by the Quota Durable Object.
+  "vars": {
+    "QUOTA_IP_CREATES_PER_DAY": 100,
+    "QUOTA_IP_BYTES_PER_DAY": 1073741824,
+    // Shared by every /64 inside one IPv6 /48, so rotating addresses doesn't multiply the budget.
+    "QUOTA_NET_CREATES_PER_DAY": 400,
+    "QUOTA_NET_BYTES_PER_DAY": 2147483648,
+    "QUOTA_GLOBAL_CREATES_PER_DAY": 50000,
+    "QUOTA_GLOBAL_BYTES_PER_DAY": 107374182400
+  },
+  // Secrets (set with `wrangler secret put`): IP_HASH_SECRET
+
+  // Error logs only; no per-request invocation logs.
+  "observability": {
+    "enabled": true,
+    "logs": { "invocation_logs": false }
+  },
+  "upload_source_maps": true
+}

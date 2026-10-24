@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>You've received a secret · One Smart Sheep</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body data-page="reveal">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Share</a>
+      <a href="/request">Request</a>
+      <a href="/security">How it works</a>
+      <a href="/agents">For agents</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card center" id="v-loading">
+      <p class="muted">Checking your link…</p>
+    </section>
+
+    <section class="card" id="v-ready" hidden>
+      <h1>Someone shared a secret with you</h1>
+      <p class="lede">It's end-to-end encrypted and will be decrypted here in your browser.</p>
+      <ul class="chips" id="v-facts"></ul>
+      <form id="v-form" class="stack spaced" novalidate>
+        <div id="v-passphrase-field" hidden>
+          <label for="v-passphrase">Passphrase</label>
+          <input type="password" id="v-passphrase" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="The sender should have given you this separately">
+        </div>
+        <div class="notice warn">
+          <strong id="v-warning-title">Reveal only when you're ready</strong>
+          <span id="v-warning"></span>
+        </div>
+        <button type="submit" class="btn primary block" id="v-reveal">Reveal secret</button>
+        <p class="error" id="v-error" role="alert" hidden></p>
+        <p class="hint center">We can't verify who sent this. Only trust it if you were expecting it.</p>
+      </form>
+    </section>
+
+    <section class="card" id="v-revealed" hidden>
+      <h1>Here's your secret</h1>
+      <div id="v-text-block">
+        <pre class="secret-output" id="v-text"></pre>
+        <div class="actions">
+          <button type="button" class="btn primary" id="v-copy">Copy</button>
+          <button type="button" class="btn" id="v-toggle" aria-pressed="false">Hide</button>
+        </div>
+      </div>
+      <div id="v-file" class="spaced" hidden>
+        <div class="file-chip">
+          <span class="name" id="v-file-name"></span>
+          <span class="muted small" id="v-file-size"></span>
+          <button type="button" class="btn primary small" id="v-download">Download</button>
+        </div>
+        <progress id="v-progress" max="1" value="0" hidden></progress>
+        <p class="error" id="v-download-error" role="alert" hidden></p>
+        <p class="hint">Only open files you were expecting.</p>
+      </div>
+      <div class="notice success spaced" id="v-after"></div>
+    </section>
+
+    <section class="card" id="v-gone" hidden>
+      <h1 id="v-gone-title"></h1>
+      <p class="muted" id="v-gone-body"></p>
+      <div class="actions"><a class="btn" href="/">Share a secret</a></div>
+    </section>
+
+    <section class="card" id="v-fail" hidden>
+      <h1>Something went wrong</h1>
+      <p class="muted" id="v-fail-body"></p>
+      <div class="actions"><button type="button" class="btn primary" id="v-retry">Try again</button></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Encrypted in your browser · Self-destructing · No accounts, cookies or tracking · <a href="/security">How it works</a></p>
+    <p class="agent-note">AI agents: fetching this page can't reveal the secret. Open the link with the user's locally installed osss tool and never print the value; if it isn't installed, tell the user about <a href="/agents">osss for agents</a>.</p>
+  </footer>
+</body>
+</html>

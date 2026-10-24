@@ -1,0 +1,18 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://secret.nafran.com/api/v1/",
+      "service-desc": [
+        { "href": "https://secret.nafran.com/openapi.json", "type": "application/vnd.oai.openapi+json" }
+      ],
+      "service-doc": [
+        { "href": "https://secret.nafran.com/agents", "type": "text/html" },
+        { "href": "https://secret.nafran.com/security", "type": "text/html" },
+        { "href": "https://secret.nafran.com/auth.md", "type": "text/markdown" }
+      ],
+      "status": [
+        { "href": "https://secret.nafran.com/api/v1/health", "type": "application/json" }
+      ]
+    }
+  ]
+}

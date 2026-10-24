@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Share passwords, keys and files through links that self-destruct. Encrypted in your browser; the key never reaches the server.">
+  <title>Share passwords that self-destruct · One Smart Sheep Secret</title>
+  <link rel="canonical" href="https://secret.nafran.com/">
+  <link rel="alternate" type="text/markdown" href="/index.md">
+  <link rel="ai-catalog" href="/.well-known/ai-catalog.json">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body class="landing" data-page="create">
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.3-8.3M16.5 6.5l2.5 2.5M14 9l2 2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m20 11.5-7.6 7.6a5 5 0 0 1-7.1-7.1l8-8a3.4 3.4 0 0 1 4.8 4.8l-7.9 7.9a1.8 1.8 0 0 1-2.6-2.6l7.2-7.2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.2 19.5 6v5.6c0 4.4-3.1 8.1-7.5 9.2-4.4-1.1-7.5-4.8-7.5-9.2V6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3.5"/><path d="m7.5 9.5 2.8 2.5-2.8 2.5M13 15h3.5"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.4a2.4 2.4 0 1 1 3.3 2.2c-.6.3-1 .8-1 1.5v.4M12 16.6h.01"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></symbol>
+    <symbol id="i-steps" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="18.5" cy="12" r="2.2"/><path d="M7.7 12h2.1M14.2 12h2.1"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 13.5 6.2 5h11.6l2.2 8.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 13.5h4.6l1.2 2.3h4.4l1.2-2.3H20"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M8 16 16 8M9.5 8H16v6.5"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 18.5v-13M6.5 11 12 5.5l5.5 5.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.5 12.5 4.2 4.2 8.8-9.4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.2 4.2 0 0 0 6 .3l2.8-2.8a4.2 4.2 0 0 0-6-6L11.5 7"/><path d="M14 10a4.2 4.2 0 0 0-6-.3l-2.8 2.8a4.2 4.2 0 0 0 6 6l1.2-1.2"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5.5l-3 13"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 3.5 4.5 7.5v9l7.5 4 7.5-4v-9z"/><path d="M4.5 7.5 12 11.5l7.5-4M12 11.5v9"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="m4 4 16 16M10.6 5.7c.5-.1.9-.2 1.4-.2 6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.9 3.7M6.6 6.9C4 8.6 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.3-1.1"/><path d="M9.9 10a3 3 0 0 0 4.1 4.2"/></symbol>
+    <symbol id="i-browser" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M3 9h18M7 14h5"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="2.2"/><rect x="4" y="13" width="16" height="7" rx="2.2"/><path d="M8 7.5h.01M8 16.5h.01"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 20.5c-3.7 0-6.5-2.7-6.5-6.3 0-2.6 1.6-4.4 3-5.8.3 1.5 1.1 2.6 2.2 3 0-3 1-6 4-8 0 2.6 1 4.2 2.3 5.7 1.1 1.3 1.9 2.8 1.9 4.9 0 3.7-3 6.5-6.9 6.5z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13.5M13 6.5l5.5 5.5-5.5 5.5"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#compose" data-focus-form>Skip to the secret form</a>
+
+  <div class="desk" aria-hidden="true">
+    <span class="blob blob-1 loop"></span>
+    <span class="blob blob-2 loop"></span>
+    <span class="blob blob-3 loop"></span>
+    <span class="blob blob-4 loop"></span>
+    <span class="blob blob-5 loop"></span>
+    <span class="blob blob-6 loop"></span>
+  </div>
+
+  <span class="bar-sentinel" id="bar-sentinel" aria-hidden="true"></span>
+  <header class="win-bar" id="top">
+    <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="28" height="28"><span class="brand-name">One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="tabs" aria-label="Main">
+      <a href="/" aria-current="page">Share</a>
+      <a href="/request">Request</a>
+      <a href="/security">Security</a>
+      <a href="/agents">For agents</a>
+    </nav>
+    <a class="btn primary small bar-cta" href="#compose" data-focus-form>New secret</a>
+  </header>
+
+  <main id="main">
+    <div class="window">
+      <div class="side">
+      <nav aria-label="On this page">
+        <p class="side-label">Secret</p>
+        <ul class="side-list">
+          <li><a class="side-row is-active" href="#compose"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>New secret</a></li>
+          <li><a class="side-row" href="/request"><svg class="ico" aria-hidden="true"><use href="#i-inbox"/></svg>Request a secret<svg class="ico ext" aria-hidden="true"><use href="#i-external"/></svg></a></li>
+        </ul>
+        <p class="side-label">On this page</p>
+        <ul class="side-list">
+          <li><a class="side-row" href="#how"><svg class="ico" aria-hidden="true"><use href="#i-steps"/></svg>How it works</a></li>
+          <li><a class="side-row" href="#features"><svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg>Features</a></li>
+          <li><a class="side-row" href="#security"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>What we can see</a></li>
+          <li><a class="side-row" href="#agents"><svg class="ico" aria-hidden="true"><use href="#i-terminal"/></svg>AI agents</a></li>
+          <li><a class="side-row" href="#faq"><svg class="ico" aria-hidden="true"><use href="#i-help"/></svg>FAQ</a></li>
+        </ul>
+      </nav>
+        <div class="habits">
+          <p class="habits-title"><span class="habits-ico" aria-hidden="true"><svg class="ico"><use href="#i-shield"/></svg></span>Good habits</p>
+          <ul>
+            <li>Keep views at one</li>
+            <li>Keep the expiry short</li>
+            <li>Send the passphrase another way</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pane">
+        <section class="banner" aria-labelledby="hero-title">
+          <div class="banner-copy">
+            <p class="kicker"><span class="kicker-chip" aria-hidden="true"><svg class="ico"><use href="#i-lock"/></svg></span>Zero-knowledge secret sharing</p>
+            <h1 id="hero-title">Share passwords that <span class="accent-text">self&#8209;destruct.</span></h1>
+            <p class="banner-sub">Encrypted in your browser, with a key that stays in the link and never reaches our server.</p>
+            <div class="banner-ctas">
+              <a class="btn primary" href="#compose" data-focus-form>Create a secret link</a>
+              <a class="btn outline" href="/request">Request a secret</a>
+            </div>
+          </div>
+          <div class="banner-art loop" aria-hidden="true">
+            <div class="shape-wrap depth-1 sw-torus">
+              <svg class="shape torus" viewBox="0 0 320 250">
+                <defs>
+                  <linearGradient id="tz-body" x1="0" y1="0" x2=".35" y2="1">
+                    <stop offset="0" stop-color="#e9e0ff"/>
+                    <stop offset=".4" stop-color="#b9a3fe"/>
+                    <stop offset=".78" stop-color="#8565f2"/>
+                    <stop offset="1" stop-color="#5a38d2"/>
+                  </linearGradient>
+                  <linearGradient id="tz-wall" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#3a1d9c"/>
+                    <stop offset=".62" stop-color="#7150e4"/>
+                    <stop offset="1" stop-color="#d2c2ff"/>
+                  </linearGradient>
+                  <radialGradient id="tz-pink" cx=".82" cy=".86" r=".55">
+                    <stop offset="0" stop-color="#ffa8e4" stop-opacity=".55"/>
+                    <stop offset="1" stop-color="#ffa8e4" stop-opacity="0"/>
+                  </radialGradient>
+                  <linearGradient id="tz-hl" x1="0" y1="0" x2="1" y2=".8">
+                    <stop offset="0" stop-color="#ffffff" stop-opacity=".95"/>
+                    <stop offset=".45" stop-color="#ffffff" stop-opacity=".55"/>
+                    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="tz-shade" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#2a0f7a" stop-opacity="0"/>
+                    <stop offset=".55" stop-color="#2a0f7a" stop-opacity=".15"/>
+                    <stop offset="1" stop-color="#2a0f7a" stop-opacity=".75"/>
+                  </linearGradient>
+                  <linearGradient id="tz-rim" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset=".6" stop-color="#ffc4f3" stop-opacity="0"/>
+                    <stop offset="1" stop-color="#ffc4f3" stop-opacity=".95"/>
+                  </linearGradient>
+                  <filter id="tz-b12" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="12"/></filter>
+                  <filter id="tz-b6" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6"/></filter>
+                  <filter id="tz-b2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2"/></filter>
+                  <clipPath id="tz-clip"><path clip-rule="evenodd" d="M12 130a148 104 0 1 0 296 0a148 104 0 1 0-296 0ZM100 110a60 33 0 1 0 120 0a60 33 0 1 0-120 0Z"/></clipPath>
+                  <clipPath id="tz-hole"><path d="M100 110a60 33 0 1 0 120 0a60 33 0 1 0-120 0Z"/></clipPath>
+                </defs>
+                <path fill="url(#tz-body)" fill-rule="evenodd" d="M12 130a148 104 0 1 0 296 0a148 104 0 1 0-296 0ZM100 110a60 33 0 1 0 120 0a60 33 0 1 0-120 0Z"/>
+                <g clip-path="url(#tz-clip)">
+                  <rect x="0" y="0" width="320" height="250" fill="url(#tz-pink)"/>
+                  <ellipse cx="160" cy="138" rx="150" ry="104" fill="none" stroke="url(#tz-shade)" stroke-width="56" filter="url(#tz-b12)"/>
+                  <ellipse cx="160" cy="118" rx="102" ry="64" fill="none" stroke="url(#tz-hl)" stroke-width="30" filter="url(#tz-b12)"/>
+                  <ellipse cx="160" cy="130" rx="146" ry="102" fill="none" stroke="url(#tz-rim)" stroke-width="7" filter="url(#tz-b6)"/>
+                  <ellipse cx="96" cy="74" rx="30" ry="9" fill="#ffffff" opacity=".9" transform="rotate(-24 96 74)" filter="url(#tz-b6)"/>
+                  <ellipse cx="86" cy="78" rx="11" ry="3.4" fill="#ffffff" transform="rotate(-26 86 78)" filter="url(#tz-b2)"/>
+                  <ellipse cx="246" cy="86" rx="20" ry="6" fill="#ffffff" opacity=".55" transform="rotate(28 246 86)" filter="url(#tz-b6)"/>
+                </g>
+                <g clip-path="url(#tz-hole)">
+                  <path fill="url(#tz-wall)" fill-rule="evenodd" d="M90 70h140v70H90ZM104 124a56 27 0 1 0 112 0a56 27 0 1 0-112 0Z"/>
+                  <ellipse cx="160" cy="139" rx="56" ry="27" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="3" filter="url(#tz-b2)"/>
+                </g>
+                <path d="M101 115a60 33 0 0 0 118 0" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="2.5" filter="url(#tz-b2)"/>
+              </svg>
+            </div>
+            <div class="shape-wrap depth-2 sw-cube">
+              <svg class="shape cube" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="cb-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd9cf"/><stop offset="1" stop-color="#ff9a85"/></linearGradient>
+                  <linearGradient id="cb-left" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7c68"/><stop offset="1" stop-color="#e4473b"/></linearGradient>
+                  <linearGradient id="cb-right" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9433a"/><stop offset="1" stop-color="#a7231d"/></linearGradient>
+                  <filter id="cb-b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6"/></filter>
+                </defs>
+                <g stroke-linejoin="round" stroke-width="11">
+                  <path d="M50 14 84 32 50 50 16 32Z" fill="#ffb8a8" stroke="#ffb8a8"/>
+                  <path d="M16 32 50 50 50 88 16 70Z" fill="#f05c4b" stroke="#f05c4b"/>
+                  <path d="M50 50 84 32 84 70 50 88Z" fill="#c1342c" stroke="#c1342c"/>
+                </g>
+                <path d="M50 14 84 32 50 50 16 32Z" fill="url(#cb-top)"/>
+                <path d="M16 32 50 50 50 88 16 70Z" fill="url(#cb-left)"/>
+                <path d="M50 50 84 32 84 70 50 88Z" fill="url(#cb-right)"/>
+                <path d="M15 33 50 51.5 85 33" fill="none" stroke="#fff3ef" stroke-opacity=".75" stroke-width="2.6" stroke-linecap="round" filter="url(#cb-b)"/>
+                <path d="M50 52v35" stroke="#ffd2c8" stroke-opacity=".35" stroke-width="2" stroke-linecap="round" filter="url(#cb-b)"/>
+                <ellipse cx="40" cy="28" rx="12" ry="4" fill="#ffffff" opacity=".7" transform="rotate(-24 40 28)" filter="url(#cb-b)"/>
+              </svg>
+            </div>
+            <div class="shape-wrap depth-2 sw-cone">
+              <svg class="shape cone" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="cn-body" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset=".1" stop-color="#ffdcd2"/>
+                    <stop offset=".42" stop-color="#ff8a74"/>
+                    <stop offset=".75" stop-color="#ea4b3d"/>
+                    <stop offset="1" stop-color="#b52a22"/>
+                  </linearGradient>
+                  <filter id="cn-b" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.8"/></filter>
+                </defs>
+                <path d="M50 8 21 76a29 11 0 0 0 58 0Z" fill="url(#cn-body)" stroke="url(#cn-body)" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M49 13 33 72l7 3Z" fill="#ffffff" opacity=".45" filter="url(#cn-b)"/>
+                <path d="M22 77a29 11 0 0 0 56 0" fill="none" stroke="#8f1d17" stroke-opacity=".35" stroke-width="3" filter="url(#cn-b)"/>
+              </svg>
+            </div>
+            <div class="shape-wrap depth-3 sw-sphere"><span class="shape sphere"></span></div>
+            <div class="shape-wrap depth-3 sw-dot"><span class="shape sphere sphere-pink"></span></div>
+          </div>
+        </section>
+
+        <section class="compose" id="compose" aria-labelledby="compose-title">
+          <div class="pane-head">
+            <h2 id="compose-title">New secret</h2>
+            <p class="pane-note"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>Text, a file, or both</p>
+          </div>
+
+          <form id="create-form" class="sheet" novalidate>
+            <div class="field">
+              <label for="secret">Secret</label>
+              <textarea id="secret" placeholder="Passwords, API keys, .env files, recovery codes…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+            </div>
+
+            <div class="field">
+              <div class="dropzone" id="c-dropzone">
+                <input type="file" id="c-file">
+                <span class="dz-icon" aria-hidden="true"><svg class="ico"><use href="#i-clip"/></svg></span>
+                <span>Attach a file (optional, up to 25 MB): <label for="c-file">browse</label> or drop it here</span>
+              </div>
+              <div class="file-chip" id="c-file-chip" hidden>
+                <span class="name" id="c-file-name"></span>
+                <span class="muted small" id="c-file-size"></span>
+                <button type="button" class="btn ghost small" id="c-file-remove">Remove</button>
+              </div>
+            </div>
+
+            <div class="opts">
+              <div class="opt">
+                <span class="opt-ico tint-amber" aria-hidden="true"><svg class="ico"><use href="#i-clock"/></svg></span>
+                <label class="opt-label" for="expires">Expires after</label>
+                <span class="opt-status"><i class="dot dot-ok"></i><span id="expires-status">Deleted at expiry</span></span>
+                <select id="expires">
+                  <option value="900">15 minutes</option>
+                  <option value="3600">1 hour</option>
+                  <option value="86400" selected>1 day</option>
+                  <option value="259200">3 days</option>
+                  <option value="604800">7 days</option>
+                </select>
+              </div>
+              <div class="opt">
+                <span class="opt-ico tint-blue" aria-hidden="true"><svg class="ico"><use href="#i-eye"/></svg></span>
+                <label class="opt-label" for="views">Can be viewed</label>
+                <span class="opt-status"><i class="dot dot-blue"></i><span id="views-status">Deleted after 1 view</span></span>
+                <select id="views">
+                  <option value="1" selected>Once</option>
+                  <option value="2">2 times</option>
+                  <option value="3">3 times</option>
+                  <option value="5">5 times</option>
+                  <option value="10">10 times</option>
+                </select>
+              </div>
+              <div class="opt opt-pass">
+                <span class="opt-ico tint-violet" aria-hidden="true"><svg class="ico"><use href="#i-key"/></svg></span>
+                <label class="opt-label" for="passphrase">Passphrase <span class="muted">(optional, recommended)</span></label>
+                <span class="opt-status" id="pass-state"><i class="dot"></i><span id="pass-status">Off</span></span>
+                <div class="input-row">
+                  <input type="password" id="passphrase" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="Share it by phone or another app">
+                  <button type="button" class="btn small" id="passphrase-toggle" aria-pressed="false">Show</button>
+                  <button type="button" class="btn small" id="passphrase-generate">Generate</button>
+                </div>
+                <p class="hint">A second lock: the link alone won't open it.</p>
+              </div>
+            </div>
+
+            <button type="submit" class="btn primary block" id="create-btn">Create secure link</button>
+            <progress id="create-progress" max="1" value="0" hidden></progress>
+            <p class="error" id="create-error" role="alert" hidden></p>
+          </form>
+        </section>
+
+        <section class="sheet created" id="created" hidden aria-labelledby="created-title">
+          <div class="created-head">
+            <span class="ok-chip" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span>
+            <div>
+              <h2 id="created-title">Your secure link is ready</h2>
+              <p class="lede">Copy it now. We can't show it again, because we never had the key.</p>
+            </div>
+          </div>
+          <ul class="chips" id="created-summary"></ul>
+          <div class="stack spaced">
+            <div>
+              <span class="label">Send this link to your recipient</span>
+              <div class="linkbox">
+                <input type="text" id="secret-link" readonly autocomplete="off" aria-label="Secret link">
+                <button type="button" class="btn primary" id="copy-secret-link">Copy link</button>
+              </div>
+            </div>
+            <div id="created-passphrase" hidden>
+              <span class="label">Passphrase</span>
+              <div class="linkbox">
+                <input type="text" id="passphrase-out" readonly autocomplete="off" aria-label="Passphrase">
+                <button type="button" class="btn" id="copy-passphrase">Copy</button>
+              </div>
+              <p class="hint">Send it separately (by phone, text or a different app), never in the same message as the link.</p>
+            </div>
+            <div class="notice">
+              <strong>Your receipt link (keep it private)</strong>
+              <p class="small">See whether it was opened and from which country, or destroy it early.</p>
+              <div class="linkbox">
+                <input type="text" id="manage-link" readonly autocomplete="off" aria-label="Receipt link">
+                <button type="button" class="btn small" id="copy-manage-link">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn" id="open-manage" href="/m" target="_blank" rel="noopener noreferrer">Open receipt</a>
+            <button type="button" class="btn ghost" id="create-another">Share another secret</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="section" id="how" aria-labelledby="how-title">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow"><i class="dot dot-blue"></i>How it works</p>
+        <h2 id="how-title">Three steps, then it's gone.</h2>
+      </div>
+      <div class="steps-wrap loop" data-reveal>
+        <ol class="steps">
+          <li class="step step-1">
+            <div class="step-art art-encrypt" aria-hidden="true">
+              <div class="mini-wrap">
+                <div class="mini">
+                  <div class="mini-bar"><i></i><i></i><i></i></div>
+                  <div class="enc-field">
+                    <span class="enc-plain">db-password: s3cr3t</span>
+                    <span class="enc-cipher">Q2x9·f8Lk·Wp3m·Zr7</span>
+                    <span class="enc-scan"></span>
+                  </div>
+                </div>
+                <span class="enc-lock"><svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="4.5" y="10.5" width="15" height="10" rx="3"/></svg></span>
+              </div>
+            </div>
+            <div class="step-copy">
+              <span class="step-num">1</span>
+              <h3>Encrypt in your browser</h3>
+              <p>Type a secret or drop in a file. It's locked on this device before anything is uploaded.</p>
+            </div>
+          </li>
+          <li class="step step-2">
+            <div class="step-art art-share" aria-hidden="true">
+              <p class="bubble bubble-in">Can you send me the login?</p>
+              <div class="out-slot">
+                <p class="bubble bubble-typing"><i></i><i></i><i></i></p>
+                <p class="bubble bubble-out"><svg class="ico"><use href="#i-link"/></svg>…/s<b>#k3Yq9vLm2T…</b></p>
+              </div>
+              <span class="chat-meta">Delivered</span>
+            </div>
+            <div class="step-copy">
+              <span class="step-num">2</span>
+              <h3>Share the link</h3>
+              <p>Send it through any chat or email. It only opens for someone who has the whole link.</p>
+            </div>
+          </li>
+          <li class="step step-3">
+            <div class="step-art art-burn" aria-hidden="true">
+              <div class="burn">
+                <div class="burn-card">
+                  <span class="burn-title"><svg class="ico"><use href="#i-lock"/></svg>Secret</span>
+                  <span class="burn-meta">1 view left</span>
+                </div>
+                <span class="shard sh-1"></span><span class="shard sh-2"></span><span class="shard sh-3"></span>
+                <span class="shard sh-4"></span><span class="shard sh-5"></span><span class="shard sh-6"></span>
+              </div>
+              <span class="burn-done"><svg class="ico"><use href="#i-check"/></svg>Deleted for good</span>
+            </div>
+            <div class="step-copy">
+              <span class="step-num">3</span>
+              <h3>It self-destructs</h3>
+              <p>After the last allowed view, or when the timer runs out, it's deleted for good.</p>
+            </div>
+          </li>
+        </ol>
+        <div class="steps-track" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow"><i class="dot dot-violet"></i>Features</p>
+        <h2 id="features-title">Built for handing over logins, keys and files.</h2>
+      </div>
+      <ul class="cards">
+        <li class="app-card lc-blue" data-reveal>
+          <div class="app-card-top"><span class="lchip" aria-hidden="true">Tx</span><h3>Text and files</h3></div>
+          <p>Paste text, attach a file, or send both in one secret.</p>
+          <p class="app-card-foot"><span class="tag"><i class="dot dot-blue"></i>64 KB text · 25 MB file</span></p>
+        </li>
+        <li class="app-card lc-amber" data-reveal>
+          <div class="app-card-top"><span class="lchip" aria-hidden="true">Ex</span><h3>Expiry</h3></div>
+          <p>When the timer runs out it's deleted, whether it was opened or not.</p>
+          <p class="app-card-foot"><span class="tag"><i class="dot dot-amber"></i>15 minutes to 7 days</span></p>
+        </li>
+        <li class="app-card lc-green" data-reveal>
+          <div class="app-card-top"><span class="lchip" aria-hidden="true">Vw</span><h3>View limit</h3></div>
+          <p>Choose how many times it can be opened. The last view deletes it.</p>
+          <p class="app-card-foot"><span class="tag"><i class="dot dot-ok"></i>1, 2, 3, 5 or 10 views</span></p>
+        </li>
+        <li class="app-card lc-violet" data-reveal>
+          <div class="app-card-top"><span class="lchip" aria-hidden="true">Pp</span><h3>Passphrase</h3></div>
+          <p>An optional second lock that never leaves your browser. Too many wrong guesses destroy the secret.</p>
+          <p class="app-card-foot"><span class="tag"><i class="dot dot-violet"></i>5 tries, then it's gone</span></p>
+        </li>
+        <li class="app-card lc-pink" data-reveal>
+          <div class="app-card-top"><span class="lchip" aria-hidden="true">Rc</span><h3>Private receipt</h3></div>
+          <p>A link only you get. See when it was opened and from which country, or destroy it early.</p>
+          <p class="app-card-foot"><span class="tag"><i class="dot dot-pink"></i>Destroy any time</span></p>
+        </li>
+        <li class="app-card lc-cyan" data-reveal>
+          <div class="app-card-top"><span class="lchip" aria-hidden="true">Rq</span><h3>Request a secret</h3></div>
+          <p>Send a request link. Your client answers once, and only you can open the reply.</p>
+          <p class="app-card-foot"><a class="btn primary small" href="/request">Request a secret</a></p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="section" id="security" aria-labelledby="security-title">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow"><i class="dot dot-ok"></i>Security</p>
+        <h2 id="security-title">What our server sees, and what it never does.</h2>
+        <p class="section-sub">Everything after the <code>#</code> in a link stays in your browser. That's where the key lives.</p>
+      </div>
+
+      <figure class="diagram loop" data-reveal>
+        <div class="urlbar">
+          <span class="url-lock" aria-hidden="true"><svg class="ico"><use href="#i-lock"/></svg></span>
+          <span class="url-text">
+            <span class="url-part part-sent"><span class="url-base">https://<span data-host>secret.nafran.com</span>/s</span><span class="url-mark"><b>Reaches the server</b></span></span><span class="url-part part-kept"><span class="url-hash">#</span><span class="url-key">k3Yq9vLm2TzX8wRp4NcA…</span><span class="url-mark"><b>The key: never sent</b></span></span>
+          </span>
+          <span class="url-example">Example link</span>
+        </div>
+        <div class="flow">
+          <div class="flow-box flow-keep">
+            <p class="flow-title"><span class="flow-ico tint-green" aria-hidden="true"><svg class="ico"><use href="#i-browser"/></svg></span>Stays in your browser</p>
+            <ul class="flow-list">
+              <li>Your text and files</li>
+              <li class="is-key">The key in the link</li>
+              <li>Your passphrase</li>
+              <li>File names</li>
+            </ul>
+          </div>
+          <div class="pipe" aria-hidden="true">
+            <span class="pipe-label">ciphertext only</span>
+            <span class="pipe-line"></span>
+            <span class="packet p-1"><b>9fQk·Zr2x</b></span>
+            <span class="packet p-2"><b>Lp0w·M4tA</b></span>
+            <span class="packet p-3"><b>x7Ve·Qn1c</b></span>
+          </div>
+          <div class="flow-box flow-server">
+            <p class="flow-title"><span class="flow-ico tint-blue" aria-hidden="true"><svg class="ico"><use href="#i-server"/></svg></span>Reaches our server</p>
+            <ul class="flow-list">
+              <li>Encrypted data, padded to hide its size</li>
+              <li>Expiry, view limits and timestamps</li>
+              <li>The country each view came from, for your receipt</li>
+              <li>One-way hashes of access tokens</li>
+            </ul>
+          </div>
+        </div>
+        <figcaption class="visually-hidden">The link's key stays in your browser; the server stores only encrypted data and metadata for your receipt.</figcaption>
+      </figure>
+
+      <div class="controls" data-reveal>
+        <p class="list-label">Protections</p>
+        <ul class="list">
+          <li class="list-row">
+            <span class="row-ico tint-green" aria-hidden="true"><svg class="ico"><use href="#i-lock"/></svg></span>
+            <span class="row-main"><strong>AES-256-GCM encryption</strong><span>Runs in your browser's built-in Web Crypto. No crypto libraries.</span></span>
+            <span class="row-status"><i class="dot dot-ok"></i>Always on</span>
+          </li>
+          <li class="list-row">
+            <span class="row-ico tint-violet" aria-hidden="true"><svg class="ico"><use href="#i-key"/></svg></span>
+            <span class="row-main"><strong>Passphrase stretching</strong><span>PBKDF2-SHA256 with 600,000 iterations.</span></span>
+            <span class="row-status"><i class="dot dot-blue"></i>When you set one</span>
+          </li>
+          <li class="list-row">
+            <span class="row-ico tint-amber" aria-hidden="true"><svg class="ico"><use href="#i-box"/></svg></span>
+            <span class="row-main"><strong>Padded sizes</strong><span>Stored size shows only a rough range, never the exact length.</span></span>
+            <span class="row-status"><i class="dot dot-ok"></i>Always on</span>
+          </li>
+          <li class="list-row">
+            <span class="row-ico tint-blue" aria-hidden="true"><svg class="ico"><use href="#i-code"/></svg></span>
+            <span class="row-main"><strong>Strict Content Security Policy</strong><span>With Trusted Types, so injected code can't run.</span></span>
+            <span class="row-status"><i class="dot dot-ok"></i>Always on</span>
+          </li>
+          <li class="list-row">
+            <span class="row-ico tint-pink" aria-hidden="true"><svg class="ico"><use href="#i-eye-off"/></svg></span>
+            <span class="row-main"><strong>No accounts, cookies or analytics</strong><span>And no third-party scripts on any page.</span></span>
+            <span class="row-status"><i class="dot dot-ok"></i>Always on</span>
+          </li>
+          <li class="list-row">
+            <span class="row-ico tint-cyan" aria-hidden="true"><svg class="ico"><use href="#i-browser"/></svg></span>
+            <span class="row-main"><strong>Key wiped from the address bar</strong><span>The page removes it as soon as the link opens.</span></span>
+            <span class="row-status"><i class="dot dot-ok"></i>Always on</span>
+          </li>
+        </ul>
+        <div class="list-foot">
+          <a class="btn outline" href="/security">Read the full security model<svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section agents" id="agents" aria-labelledby="agents-title">
+      <div class="agents-grid">
+        <div class="agents-copy" data-reveal>
+          <p class="eyebrow"><i class="dot dot-cyan"></i>For AI agents</p>
+          <h2 id="agents-title">Built for AI agents, too.</h2>
+          <p class="section-sub">A command-line tool and MCP server let Claude Code and other agents open a secret link on your own machine, without printing the secret.</p>
+          <a class="btn outline" href="/agents">How it works with agents<svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="term loop" data-reveal>
+          <div class="term-bar" aria-hidden="true"><span class="lights"><i></i><i></i><i></i></span><span class="term-title">Terminal</span></div>
+          <pre class="term-body"><code><span class="term-line"><span class="term-prompt" aria-hidden="true">~ %</span> <span class="typed" id="term-command">osss open https://<span data-host>secret.nafran.com</span>/s#k3Yq…</span><span class="caret" aria-hidden="true"></span></span>
+<span class="term-line term-note"># prints a handle, never the secret</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow"><i class="dot dot-amber"></i>FAQ</p>
+        <h2 id="faq-title">Before you hit send.</h2>
+      </div>
+      <div class="faq" data-reveal>
+        <div class="faq-item">
+          <h3><button type="button" class="faq-q" id="faq-q1" aria-expanded="true" aria-controls="faq-a1">What if someone else opens the link first?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-a" id="faq-a1" role="region" aria-labelledby="faq-q1"><div><p>Then it's gone for your recipient, who'll see that it was already viewed. Your receipt shows when and from which country it was opened, so you'll know to change that password.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <h3><button type="button" class="faq-q" id="faq-q2" aria-expanded="true" aria-controls="faq-a2">I sent it to the wrong person. Can I take it back?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-a" id="faq-a2" role="region" aria-labelledby="faq-q2"><div><p>Open your receipt link and press Destroy now. If it hasn't been opened yet, nobody will be able to read it.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <h3><button type="button" class="faq-q" id="faq-q3" aria-expanded="true" aria-controls="faq-a3">What's left after a secret is gone?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-a" id="faq-a3" role="region" aria-labelledby="faq-q3"><div><p>The content and any attached file are erased. A receipt with times and countries, but no content, is kept for 30 days so your receipt link keeps working. Cloudflare may hold encrypted backups for up to 30 days, and those are unreadable without your link.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <h3><button type="button" class="faq-q" id="faq-q4" aria-expanded="true" aria-controls="faq-a4">Can two people open a one-time link at the same moment?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-a" id="faq-a4" role="region" aria-labelledby="faq-q4"><div><p>No. Each secret lives in its own strongly consistent Cloudflare Durable Object, so even if two people click at the same instant, only one of them gets it.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <h3><button type="button" class="faq-q" id="faq-q5" aria-expanded="true" aria-controls="faq-a5">How do I know who sent me a secret?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-a" id="faq-a5" role="region" aria-labelledby="faq-q5"><div><p>We can't tell you. Anyone can create a secret, so a link never comes from One Smart Sheep itself. Only trust a secret you were expecting.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <h3><button type="button" class="faq-q" id="faq-q6" aria-expanded="true" aria-controls="faq-a6">What can't this protect against?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-a" id="faq-a6" role="region" aria-labelledby="faq-q6"><div><p>A compromised device or a malicious browser extension can read anything on your screen. And because your browser runs the code our server sends, a compromised server could send modified JavaScript. That's true of any encryption that runs in a web page.</p></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <nav class="dock" aria-label="Pages">
+      <a class="dock-item" href="#compose" data-focus-form><span class="dock-icon di-share"><img src="/assets/logo.svg" alt="" width="52" height="52"></span><span class="dock-label">New secret</span></a>
+      <a class="dock-item" href="/request"><span class="dock-icon di-request"><svg class="ico" aria-hidden="true"><use href="#i-inbox"/></svg></span><span class="dock-label">Request a secret</span></a>
+      <a class="dock-item" href="/security"><span class="dock-icon di-security"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></span><span class="dock-label">Security</span></a>
+      <a class="dock-item" href="/agents"><span class="dock-icon di-agents"><svg class="ico" aria-hidden="true"><use href="#i-terminal"/></svg></span><span class="dock-label">For agents</span></a>
+      <span class="dock-sep" aria-hidden="true"></span>
+      <a class="dock-item" href="#top"><span class="dock-icon di-top"><svg class="ring" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="22" pathLength="100"/></svg><svg class="ico" aria-hidden="true"><use href="#i-up"/></svg></span><span class="dock-label">Back to top</span></a>
+    </nav>
+    <div class="signature" data-reveal>
+      <p class="wordmark" aria-hidden="true"><span>S</span><span>e</span><span>c</span><span>r</span><span>e</span><span>t</span></p>
+      <p class="foot-time" id="foot-time">Whatever you share doesn't have to outlive the day.</p>
+    </div>
+    <p class="foot-sign"><span class="sign-item"><img src="/assets/logo.svg" alt="" width="20" height="20">Made by One Smart Sheep</span><span class="sign-sep" aria-hidden="true">·</span><span class="sign-item">Runs on Cloudflare's edge</span></p>
+  </footer>
+</body>
+</html>

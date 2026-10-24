@@ -1,0 +1,16 @@
+node_modules/
+coverage/
+.wrangler/
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+public/assets/app.js
+public/cli/
+public/.well-known/agent-skills/index.json
+public/assets/app.js.map
+e2e/artifacts/
+.DS_Store

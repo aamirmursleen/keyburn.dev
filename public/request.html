@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>Request a secret · One Smart Sheep</title>
+  <meta name="description" content="Ask someone to send you a password, API key or file through a one-time link that only you can open.">
+  <link rel="canonical" href="https://secret.nafran.com/request">
+  <link rel="alternate" type="text/markdown" href="/request.md">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body data-page="request">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Share</a>
+      <a href="/request" aria-current="page">Request</a>
+      <a href="/security">How it works</a>
+      <a href="/agents">For agents</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card" id="q-compose">
+      <h1>Request a secret</h1>
+      <p class="lede">Get a link to send to a client. Whatever they submit is encrypted so that only you can open it, even we can't.</p>
+      <form id="q-form" class="stack" novalidate>
+        <div>
+          <label for="q-note">What do you need? <span class="muted">(optional)</span></label>
+          <textarea id="q-note" class="note" maxlength="1000" placeholder="e.g. The WordPress admin login for acme.com" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+          <p class="hint">Also encrypted: only you and your client can read it.</p>
+        </div>
+        <div>
+          <label for="q-expires">The link works for</label>
+          <select id="q-expires">
+            <option value="3600">1 hour</option>
+            <option value="86400">1 day</option>
+            <option value="259200" selected>3 days</option>
+            <option value="604800">7 days</option>
+          </select>
+        </div>
+        <button type="submit" class="btn primary block" id="q-btn">Create request link</button>
+        <p class="error" id="q-error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section class="card" id="q-created" hidden>
+      <h1>Your request link is ready</h1>
+      <div class="stack spaced">
+        <div>
+          <span class="label">1. Send this link to your client</span>
+          <div class="linkbox">
+            <input type="text" id="q-client-link" readonly autocomplete="off" aria-label="Client link">
+            <button type="button" class="btn primary" id="q-copy-client">Copy link</button>
+          </div>
+        </div>
+        <div class="notice warn">
+          <strong>2. Save your private inbox link now</strong>
+          <p class="small">It's the only way to open what they send, and it can't be recovered. Keep it in your password manager.</p>
+          <div class="linkbox">
+            <input type="text" id="q-inbox-link" readonly autocomplete="off" aria-label="Inbox link">
+            <button type="button" class="btn small" id="q-copy-inbox">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn" id="q-open-inbox" href="/i" target="_blank" rel="noopener noreferrer">Open inbox</a>
+        <button type="button" class="btn ghost" id="q-another">Create another</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Encrypted in your browser · Self-destructing · No accounts, cookies or tracking · <a href="/security">How it works</a></p>
+  </footer>
+</body>
+</html>

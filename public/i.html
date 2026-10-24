@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>Request inbox · One Smart Sheep</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body data-page="inbox">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Share</a>
+      <a href="/request">Request</a>
+      <a href="/security">How it works</a>
+      <a href="/agents">For agents</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card center" id="i-loading">
+      <p class="muted">Opening your inbox…</p>
+    </section>
+
+    <section class="card" id="i-view" hidden>
+      <div class="row-between">
+        <h1>Request inbox</h1>
+        <span class="badge" id="i-badge"></span>
+      </div>
+      <p class="lede" id="i-summary"></p>
+      <div class="notice spaced" id="i-note-box" hidden>
+        <strong>You asked for</strong>
+        <span id="i-note"></span>
+      </div>
+      <dl class="kv spaced" id="i-details"></dl>
+      <div class="spaced" id="i-client-box" hidden>
+        <span class="label">Client link</span>
+        <div class="linkbox">
+          <input type="text" id="i-client-link" readonly autocomplete="off" aria-label="Client link">
+          <button type="button" class="btn small" id="i-copy-client">Copy</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn primary" id="i-open" hidden>Open response</button>
+        <button type="button" class="btn" id="i-refresh">Refresh</button>
+        <button type="button" class="btn danger" id="i-cancel" hidden>Cancel request</button>
+      </div>
+      <p class="error" id="i-error" role="alert" hidden></p>
+    </section>
+
+    <section class="card" id="i-content" hidden>
+      <h1>Their response</h1>
+      <div id="i-text-block">
+        <pre class="secret-output" id="i-text"></pre>
+        <div class="actions">
+          <button type="button" class="btn primary" id="i-copy">Copy</button>
+          <button type="button" class="btn" id="i-toggle" aria-pressed="false">Hide</button>
+        </div>
+      </div>
+      <div id="i-file" class="spaced" hidden>
+        <div class="file-chip">
+          <span class="name" id="i-file-name"></span>
+          <span class="muted small" id="i-file-size"></span>
+          <button type="button" class="btn primary small" id="i-download">Download</button>
+        </div>
+        <progress id="i-progress" max="1" value="0" hidden></progress>
+        <p class="error" id="i-download-error" role="alert" hidden></p>
+        <p class="hint">Only open files you were expecting.</p>
+      </div>
+      <div class="notice success spaced" id="i-after"></div>
+    </section>
+
+    <section class="card" id="i-gone" hidden>
+      <h1>Inbox not found</h1>
+      <p class="muted">This inbox link is incomplete or invalid, or the request has been deleted. Records are kept for 30 days after a request ends.</p>
+      <div class="actions"><a class="btn" href="/request">Create a new request</a></div>
+    </section>
+
+    <section class="card" id="i-fail" hidden>
+      <h1>Something went wrong</h1>
+      <p class="muted" id="i-fail-body"></p>
+      <div class="actions"><button type="button" class="btn primary" id="i-retry">Try again</button></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Encrypted in your browser · Self-destructing · No accounts, cookies or tracking · <a href="/security">How it works</a></p>
+  </footer>
+</body>
+</html>

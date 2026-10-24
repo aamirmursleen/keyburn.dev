@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>How it works · One Smart Sheep Secret</title>
+  <meta name="description" content="How One Smart Sheep Secret keeps shared passwords and files private: encryption in your browser, keys that never reach the server, self-destructing storage.">
+  <link rel="canonical" href="https://secret.nafran.com/security">
+  <link rel="alternate" type="text/markdown" href="/security.md">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="static">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Share</a>
+      <a href="/request">Request</a>
+      <a href="/security" aria-current="page">How it works</a>
+      <a href="/agents">For agents</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <h1>How your secrets stay secret</h1>
+      <p class="lede">We built this so that nobody, including us and our hosting provider, can read what you share.</p>
+      <ul class="features">
+        <li>
+          <h2>Encrypted before it leaves your device</h2>
+          <p>Your browser encrypts everything with AES-256-GCM using its built-in Web Crypto engine. Only scrambled data ever reaches our servers.</p>
+        </li>
+        <li>
+          <h2>The key never reaches us</h2>
+          <p>The decryption key lives in the part of the link after the <code>#</code>, which browsers never send to a server. The page also removes it from the address bar as soon as it opens.</p>
+        </li>
+        <li>
+          <h2>Passphrases are a real second lock</h2>
+          <p>A passphrase is mixed into the encryption key (PBKDF2-SHA256, 600,000 rounds) and is never sent to us. After 5 wrong attempts the secret is destroyed.</p>
+        </li>
+        <li>
+          <h2>Truly one-time</h2>
+          <p>Each secret lives in its own strongly consistent Cloudflare Durable Object, so even if two people click at the same instant, only one of them can open a one-time secret.</p>
+        </li>
+        <li>
+          <h2>Gone for good</h2>
+          <p>Secrets are deleted the moment their last view is used, and exact timers delete them at expiry. Files are erased from storage too. Afterwards only a receipt remains for 30 days (times and countries, no content).</p>
+        </li>
+        <li>
+          <h2>Requests only you can open</h2>
+          <p>Request links use public-key encryption (ECDH P-256). Your client encrypts with a key from the link, and only your private inbox link can decrypt it.</p>
+        </li>
+        <li>
+          <h2>No tracking, no third parties</h2>
+          <p>No accounts, cookies, analytics or third-party scripts. Pages run under a strict Content Security Policy with Trusted Types, so injected code can't run.</p>
+        </li>
+        <li>
+          <h2>Even sizes are hidden</h2>
+          <p>Everything is padded before encryption, to at least 1 KB, so the stored size shows only a rough size range, never the exact length of your secret or file.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>What we store, and for how long</h2>
+      <p class="muted">Encrypted data, its padded size, timestamps, the country a secret was opened from (for your receipt) and one-way hashes of access tokens. Content is deleted on view or expiry; receipts after 30 days. Like any cloud service, Cloudflare may keep encrypted backups for up to 30 days, and without your link those are unreadable.</p>
+      <h2>What no website can protect against</h2>
+      <p class="muted">A compromised device or a malicious browser extension can read anything you see. Sending the link and the passphrase in the same message weakens the second lock. Anyone who gets the full link before your recipient can open it, which your receipt will show.</p>
+      <h2>Good habits</h2>
+      <p class="muted">Use a passphrase for anything important, and send it a different way. Keep expiry short and views at one. Check the receipt and destroy anything you no longer need.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Encrypted in your browser · Self-destructing · No accounts, cookies or tracking</p>
+  </footer>
+</body>
+</html>

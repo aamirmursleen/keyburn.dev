@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>Secret receipt · One Smart Sheep</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body data-page="manage">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Share</a>
+      <a href="/request">Request</a>
+      <a href="/security">How it works</a>
+      <a href="/agents">For agents</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card center" id="m-loading">
+      <p class="muted">Loading receipt…</p>
+    </section>
+
+    <section class="card" id="m-view" hidden>
+      <div class="row-between">
+        <h1>Secret receipt</h1>
+        <span class="badge" id="m-badge"></span>
+      </div>
+      <p class="lede" id="m-summary"></p>
+      <dl class="kv" id="m-details"></dl>
+      <h2 class="section-title">Activity</h2>
+      <ul class="events" id="m-events"></ul>
+      <div class="actions">
+        <button type="button" class="btn" id="m-refresh">Refresh</button>
+        <button type="button" class="btn danger" id="m-destroy" hidden>Destroy now</button>
+      </div>
+      <p class="error" id="m-error" role="alert" hidden></p>
+    </section>
+
+    <section class="card" id="m-gone" hidden>
+      <h1>Receipt not found</h1>
+      <p class="muted">This receipt link is incomplete or invalid, or the record has been deleted. Receipts are kept for 30 days after a secret ends.</p>
+      <div class="actions"><a class="btn" href="/">Share a secret</a></div>
+    </section>
+
+    <section class="card" id="m-fail" hidden>
+      <h1>Something went wrong</h1>
+      <p class="muted" id="m-fail-body"></p>
+      <div class="actions"><button type="button" class="btn primary" id="m-retry">Try again</button></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Encrypted in your browser · Self-destructing · No accounts, cookies or tracking · <a href="/security">How it works</a></p>
+  </footer>
+</body>
+</html>

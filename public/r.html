@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>Send a secret securely · One Smart Sheep</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body data-page="submit">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="30" height="30"><span>One Smart Sheep</span><span class="brand-tag">Secret</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/security">How it works</a>
+      <a href="/agents">For agents</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card center" id="r-loading">
+      <p class="muted">Checking your link…</p>
+    </section>
+
+    <section class="card" id="r-compose" hidden>
+      <h1>Send a secret securely</h1>
+      <p class="lede">Someone asked you to send them sensitive information through this link. It's encrypted on your device so only they can open it.</p>
+      <div class="notice spaced" id="r-note-box" hidden>
+        <strong>Their request</strong>
+        <span id="r-note"></span>
+      </div>
+      <form id="r-form" class="stack spaced" novalidate>
+        <div>
+          <label for="r-secret">Your secret</label>
+          <textarea id="r-secret" placeholder="Passwords, keys, account details…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+        </div>
+        <div>
+          <div class="dropzone" id="r-dropzone">
+            <input type="file" id="r-file">
+            <span>Attach a file (optional, up to 25 MB): <label for="r-file">browse</label> or drop it here</span>
+          </div>
+          <div class="file-chip" id="r-file-chip" hidden>
+            <span class="name" id="r-file-name"></span>
+            <span class="muted small" id="r-file-size"></span>
+            <button type="button" class="btn ghost small" id="r-file-remove">Remove</button>
+          </div>
+        </div>
+        <button type="submit" class="btn primary block" id="r-btn">Encrypt and send</button>
+        <progress id="r-progress" max="1" value="0" hidden></progress>
+        <p class="error" id="r-error" role="alert" hidden></p>
+        <p class="hint center">Only send this if you know who asked and were expecting it. You can answer a request once.</p>
+      </form>
+    </section>
+
+    <section class="card" id="r-sent" hidden>
+      <h1>Sent securely</h1>
+      <p class="muted">Only the person who asked can open it. It's deleted from our servers as soon as they do, or after 7 days if they don't.</p>
+    </section>
+
+    <section class="card" id="r-closed" hidden>
+      <h1 id="r-closed-title"></h1>
+      <p class="muted" id="r-closed-body"></p>
+    </section>
+
+    <section class="card" id="r-fail" hidden>
+      <h1>Something went wrong</h1>
+      <p class="muted" id="r-fail-body"></p>
+      <div class="actions"><button type="button" class="btn primary" id="r-retry">Try again</button></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Encrypted in your browser · Self-destructing · No accounts, cookies or tracking · <a href="/security">How it works</a></p>
+  </footer>
+</body>
+</html>

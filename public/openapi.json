@@ -1,0 +1,1832 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "One Smart Sheep Secret API",
+    "version": "1.0.0",
+    "summary": "Zero-knowledge API for self-destructing secrets and secret requests.",
+    "description": "Every value sent to this API is produced by client-side cryptography (protocol osss/v1): secrets are encrypted on the sender's device with AES-256-GCM, and only ciphertext, sizes and hashes of link-derived tokens reach the server. Links carry their key after '#', which must never be sent to any server, including this one.\n\nAI agents should not call this API directly: use the local osss tool (https://secret.nafran.com/agents), which implements the protocol and never prints secrets. The protocol is implemented by the reference client osss (versioned downloads under https://secret.nafran.com/cli/, listed in SHA256SUMS) and described at https://secret.nafran.com/security.\n\nThere is no authentication: possession of a link is the authorization (see https://secret.nafran.com/auth.md). Requests from browsers must be same-origin. Limits per client IP: 10 creations, 60 reads and 10 uploads per minute, plus daily quotas."
+  },
+  "externalDocs": {
+    "description": "For AI agents",
+    "url": "https://secret.nafran.com/agents"
+  },
+  "servers": [
+    {
+      "url": "https://secret.nafran.com/api/v1"
+    },
+    {
+      "url": "https://secrets.nafran.com/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Secrets"
+    },
+    {
+      "name": "Requests"
+    },
+    {
+      "name": "Files"
+    },
+    {
+      "name": "Service"
+    }
+  ],
+  "paths": {
+    "/secret/create": {
+      "post": {
+        "operationId": "createSecret",
+        "summary": "Create a secret",
+        "description": "Stores an already encrypted secret. `id` must equal the first 16 bytes of SHA-256(\"osss/v1/secret/bound-id\" || metaHash). If `file` is declared, upload its ciphertext with the returned `uploadToken` within 15 minutes.",
+        "tags": [
+          "Secrets"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "expiresAt",
+                        "uploadToken"
+                      ],
+                      "properties": {
+                        "expiresAt": {
+                          "$ref": "#/components/schemas/Time"
+                        },
+                        "uploadToken": {
+                          "oneOf": [
+                            {
+                              "$ref": "#/components/schemas/Token"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "metaHash",
+                  "readHash",
+                  "manageHash",
+                  "iv",
+                  "ct",
+                  "expiresIn",
+                  "maxViews",
+                  "kdf",
+                  "file"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "metaHash": {
+                    "$ref": "#/components/schemas/Token"
+                  },
+                  "readHash": {
+                    "$ref": "#/components/schemas/Token"
+                  },
+                  "manageHash": {
+                    "$ref": "#/components/schemas/Token"
+                  },
+                  "iv": {
+                    "$ref": "#/components/schemas/Iv"
+                  },
+                  "ct": {
+                    "$ref": "#/components/schemas/Ciphertext"
+                  },
+                  "expiresIn": {
+                    "enum": [
+                      900,
+                      3600,
+                      86400,
+                      259200,
+                      604800
+                    ],
+                    "description": "Seconds until it expires."
+                  },
+                  "maxViews": {
+                    "enum": [
+                      1,
+                      2,
+                      3,
+                      5,
+                      10
+                    ]
+                  },
+                  "kdf": {
+                    "$ref": "#/components/schemas/Kdf"
+                  },
+                  "file": {
+                    "$ref": "#/components/schemas/FileDeclaration"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/secret/meta": {
+      "post": {
+        "operationId": "secretMeta",
+        "summary": "Check a secret without opening it",
+        "description": "Returns whether a secret is still available and whether it needs a passphrase. Does not use a view.",
+        "tags": [
+          "Secrets"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "state",
+                            "kdf",
+                            "expiresAt",
+                            "viewsLeft",
+                            "attemptsLeft",
+                            "file"
+                          ],
+                          "properties": {
+                            "state": {
+                              "const": "active"
+                            },
+                            "kdf": {
+                              "$ref": "#/components/schemas/Kdf"
+                            },
+                            "expiresAt": {
+                              "$ref": "#/components/schemas/Time"
+                            },
+                            "viewsLeft": {
+                              "type": "integer"
+                            },
+                            "attemptsLeft": {
+                              "type": "integer"
+                            },
+                            "file": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "size"
+                                  ],
+                                  "properties": {
+                                    "size": {
+                                      "type": "integer"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "state",
+                            "reason",
+                            "at"
+                          ],
+                          "properties": {
+                            "state": {
+                              "const": "gone"
+                            },
+                            "reason": {
+                              "$ref": "#/components/schemas/GoneReason"
+                            },
+                            "at": {
+                              "$ref": "#/components/schemas/Time"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "metaToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "metaToken": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "HKDF(S, \"osss/v1/secret/meta\") from the link."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/secret/open": {
+      "post": {
+        "operationId": "openSecret",
+        "summary": "Open a secret (uses one view)",
+        "description": "Returns the ciphertext and uses up one view. A wrong passphrase (wrong readToken) returns 403 `wrong_passphrase` with `attemptsLeft`; after 5 the secret is destroyed.",
+        "tags": [
+          "Secrets"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "iv",
+                        "ct",
+                        "viewsLeft",
+                        "file"
+                      ],
+                      "properties": {
+                        "iv": {
+                          "$ref": "#/components/schemas/Iv"
+                        },
+                        "ct": {
+                          "$ref": "#/components/schemas/Ciphertext"
+                        },
+                        "viewsLeft": {
+                          "type": "integer"
+                        },
+                        "file": {
+                          "$ref": "#/components/schemas/FileTicket"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "metaToken",
+                  "readToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "metaToken": {
+                    "$ref": "#/components/schemas/Token"
+                  },
+                  "readToken": {
+                    "$ref": "#/components/schemas/Token"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/secret/status": {
+      "post": {
+        "operationId": "secretStatus",
+        "summary": "Receipt: when a secret was opened",
+        "description": "For the sender, with the manage token from the receipt link.",
+        "tags": [
+          "Secrets"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SecretStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "manageToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "manageToken": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "The token from the receipt link (/m#<id>.<manageToken>)."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/secret/revoke": {
+      "post": {
+        "operationId": "revokeSecret",
+        "summary": "Destroy a secret now",
+        "description": "Deletes the content and any file immediately; the receipt remains.",
+        "tags": [
+          "Secrets"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SecretStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "manageToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "manageToken": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "The token from the receipt link."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/secret/download": {
+      "post": {
+        "operationId": "downloadSecretFile",
+        "summary": "Download an attached file's ciphertext",
+        "description": "Streams the encrypted file once, using the ticket returned by /secret/open.",
+        "tags": [
+          "Secrets"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ciphertext",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "ticket"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "ticket": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "The download ticket."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request/create": {
+      "post": {
+        "operationId": "createRequest",
+        "summary": "Create a request for a secret",
+        "description": "Stores a request. `id` must equal the first 16 bytes of SHA-256(\"osss/v1/request/bound-id\" || submitHash). `pub` is the requester's P-256 public key.",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "expiresAt": {
+                          "$ref": "#/components/schemas/Time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "submitHash",
+                  "inboxHash",
+                  "pub",
+                  "note",
+                  "expiresIn"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "submitHash": {
+                    "$ref": "#/components/schemas/Token"
+                  },
+                  "inboxHash": {
+                    "$ref": "#/components/schemas/Token"
+                  },
+                  "pub": {
+                    "$ref": "#/components/schemas/PublicKey"
+                  },
+                  "note": {
+                    "$ref": "#/components/schemas/Sealed"
+                  },
+                  "expiresIn": {
+                    "enum": [
+                      3600,
+                      86400,
+                      259200,
+                      604800
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request/info": {
+      "post": {
+        "operationId": "requestInfo",
+        "summary": "Read a request before answering",
+        "description": "Returns the encrypted note while the request is open.",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "state",
+                            "note",
+                            "expiresAt"
+                          ],
+                          "properties": {
+                            "state": {
+                              "const": "open"
+                            },
+                            "note": {
+                              "$ref": "#/components/schemas/Sealed"
+                            },
+                            "expiresAt": {
+                              "$ref": "#/components/schemas/Time"
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "state",
+                            "reason"
+                          ],
+                          "properties": {
+                            "state": {
+                              "const": "closed"
+                            },
+                            "reason": {
+                              "enum": [
+                                "submitted",
+                                "viewed",
+                                "expired",
+                                "revoked",
+                                "locked",
+                                "opened",
+                                "abandoned"
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "submitToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "submitToken": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "HKDF(Q, \"osss/v1/request/submit\") from the request link."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request/submit": {
+      "post": {
+        "operationId": "submitRequest",
+        "summary": "Answer a request (once)",
+        "description": "Stores the answer, encrypted to the requester's public key with an ephemeral ECDH key.",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "201": {
+            "description": "Submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "uploadToken"
+                      ],
+                      "properties": {
+                        "uploadToken": {
+                          "oneOf": [
+                            {
+                              "$ref": "#/components/schemas/Token"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "submitToken",
+                  "ephPub",
+                  "iv",
+                  "ct",
+                  "file"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "submitToken": {
+                    "$ref": "#/components/schemas/Token"
+                  },
+                  "ephPub": {
+                    "$ref": "#/components/schemas/PublicKey"
+                  },
+                  "iv": {
+                    "$ref": "#/components/schemas/Iv"
+                  },
+                  "ct": {
+                    "$ref": "#/components/schemas/Ciphertext"
+                  },
+                  "file": {
+                    "$ref": "#/components/schemas/FileDeclaration"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request/status": {
+      "post": {
+        "operationId": "inboxStatus",
+        "summary": "Inbox: has the request been answered",
+        "description": "For the requester, with the token derived from the inbox link.",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/InboxStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "inboxToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "inboxToken": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "HKDF(Q || d, \"osss/v1/request/inbox\") from the inbox link."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request/open": {
+      "post": {
+        "operationId": "openInbox",
+        "summary": "Inbox: open the answer",
+        "description": "Returns the encrypted answer once.",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "ephPub",
+                        "iv",
+                        "ct",
+                        "file"
+                      ],
+                      "properties": {
+                        "ephPub": {
+                          "$ref": "#/components/schemas/PublicKey"
+                        },
+                        "iv": {
+                          "$ref": "#/components/schemas/Iv"
+                        },
+                        "ct": {
+                          "$ref": "#/components/schemas/Ciphertext"
+                        },
+                        "file": {
+                          "$ref": "#/components/schemas/FileTicket"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "inboxToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "inboxToken": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "The inbox token."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request/revoke": {
+      "post": {
+        "operationId": "revokeRequest",
+        "summary": "Inbox: destroy the request",
+        "description": "Deletes the request and any answer immediately.",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/InboxStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "inboxToken"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "inboxToken": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "The inbox token."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request/download": {
+      "post": {
+        "operationId": "downloadRequestFile",
+        "summary": "Download an answer's file ciphertext",
+        "description": "Streams the encrypted file once, using the ticket returned by /request/open.",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ciphertext",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "ticket"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "ticket": {
+                    "$ref": "#/components/schemas/Token",
+                    "description": "The download ticket."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload": {
+      "put": {
+        "operationId": "uploadFile",
+        "summary": "Upload a file's ciphertext",
+        "tags": [
+          "Files"
+        ],
+        "description": "Uploads exactly the declared number of ciphertext bytes for a secret or a request answer, within 15 minutes of creating it.",
+        "parameters": [
+          {
+            "name": "X-Vault-Box",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^(secret|request):[A-Za-z0-9_-]{22}$"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^Bearer [A-Za-z0-9_-]{43}$"
+            },
+            "description": "Bearer <uploadToken>"
+          },
+          {
+            "name": "Content-Length",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "size"
+                      ],
+                      "properties": {
+                        "size": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          },
+          "415": {
+            "description": "Content-Type must be application/octet-stream",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "Service health",
+        "tags": [
+          "Service"
+        ],
+        "description": "Returns ok when the API is serving requests. Touches no storage.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "status",
+                        "protocol"
+                      ],
+                      "properties": {
+                        "status": {
+                          "const": "ok"
+                        },
+                        "protocol": {
+                          "const": "osss/v1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/Limited"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Id": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{22}$",
+        "description": "Record id (16 bytes, base64url). Derived from the link and bound to its hash, so it can't be chosen freely."
+      },
+      "Token": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{43}$",
+        "description": "A 32-byte token (base64url) derived from a link with HKDF-SHA-256, or its SHA-256 hash."
+      },
+      "Iv": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{16}$",
+        "description": "AES-GCM nonce (12 bytes, base64url)."
+      },
+      "PublicKey": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{87}$",
+        "description": "Uncompressed P-256 public key (65 bytes, base64url)."
+      },
+      "Ciphertext": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]+$",
+        "description": "AES-256-GCM ciphertext (base64url) of a padded payload: at least 1 KiB plus the 16-byte tag; at most about 64 KiB of plaintext."
+      },
+      "Time": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Milliseconds since the Unix epoch."
+      },
+      "Kdf": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "alg",
+              "iterations",
+              "salt"
+            ],
+            "properties": {
+              "alg": {
+                "const": "PBKDF2-SHA256"
+              },
+              "iterations": {
+                "type": "integer",
+                "minimum": 600000,
+                "maximum": 5000000
+              },
+              "salt": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{22}$",
+                "description": "Salt (16 bytes, base64url)."
+              }
+            }
+          }
+        ],
+        "description": "Passphrase key-derivation parameters, or null when there is no passphrase."
+      },
+      "FileDeclaration": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "size",
+              "iv"
+            ],
+            "properties": {
+              "size": {
+                "type": "integer",
+                "description": "Ciphertext size in bytes: padded file (1 KiB to 25 MiB) plus the 16-byte tag."
+              },
+              "iv": {
+                "$ref": "#/components/schemas/Iv"
+              }
+            }
+          }
+        ]
+      },
+      "FileTicket": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "size",
+              "iv",
+              "ticket"
+            ],
+            "properties": {
+              "size": {
+                "type": "integer"
+              },
+              "iv": {
+                "$ref": "#/components/schemas/Iv"
+              },
+              "ticket": {
+                "$ref": "#/components/schemas/Token",
+                "description": "One-time download ticket, valid for 15 minutes."
+              }
+            }
+          }
+        ]
+      },
+      "Sealed": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "iv",
+              "ct"
+            ],
+            "properties": {
+              "iv": {
+                "$ref": "#/components/schemas/Iv"
+              },
+              "ct": {
+                "$ref": "#/components/schemas/Ciphertext"
+              }
+            }
+          }
+        ]
+      },
+      "GoneReason": {
+        "enum": [
+          "viewed",
+          "expired",
+          "revoked",
+          "locked",
+          "opened",
+          "abandoned"
+        ]
+      },
+      "ViewEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "at",
+          "country"
+        ],
+        "properties": {
+          "at": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Z0-9]{2}$"
+          }
+        }
+      },
+      "SecretStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "state",
+          "createdAt",
+          "expiresAt",
+          "endedAt",
+          "maxViews",
+          "viewsLeft",
+          "passphrase",
+          "hasFile",
+          "views"
+        ],
+        "properties": {
+          "state": {
+            "enum": [
+              "active",
+              "viewed",
+              "expired",
+              "revoked",
+              "locked",
+              "opened",
+              "abandoned"
+            ]
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "expiresAt": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "endedAt": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxViews": {
+            "type": "integer"
+          },
+          "viewsLeft": {
+            "type": "integer"
+          },
+          "passphrase": {
+            "type": "boolean"
+          },
+          "hasFile": {
+            "type": "boolean"
+          },
+          "views": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ViewEvent"
+            },
+            "maxItems": 10
+          }
+        }
+      },
+      "InboxStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "state",
+          "createdAt",
+          "expiresAt",
+          "endedAt",
+          "pub",
+          "note",
+          "submittedAt",
+          "country",
+          "file"
+        ],
+        "properties": {
+          "state": {
+            "enum": [
+              "waiting",
+              "receiving",
+              "received",
+              "viewed",
+              "expired",
+              "revoked",
+              "locked",
+              "opened",
+              "abandoned"
+            ]
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "expiresAt": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "endedAt": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pub": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PublicKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "$ref": "#/components/schemas/Sealed"
+          },
+          "submittedAt": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "file": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "size"
+                ],
+                "properties": {
+                  "size": {
+                    "type": "integer"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "success",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "const": false
+          },
+          "error": {
+            "enum": [
+              "bad_request",
+              "unsupported_media_type",
+              "payload_too_large",
+              "forbidden",
+              "method_not_allowed",
+              "not_found",
+              "conflict",
+              "wrong_passphrase",
+              "rate_limited",
+              "quota_exceeded",
+              "capacity",
+              "unavailable",
+              "internal"
+            ]
+          },
+          "attemptsLeft": {
+            "type": "integer",
+            "description": "Passphrase attempts left (only with wrong_passphrase)."
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Malformed request, or a value that doesn't match its link",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Cross-site request, or a wrong passphrase (wrong_passphrase, with attemptsLeft)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Unknown record or wrong token (indistinguishable on purpose)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "TooLarge": {
+        "description": "Body too large",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Limited": {
+        "description": "rate_limited, quota_exceeded or capacity; try again later",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}
