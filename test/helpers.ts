@@ -30,7 +30,7 @@ import {
 } from "../src/shared/protocol";
 import type { Vault } from "../src/worker/vault";
 
-export const ORIGIN = "https://secret.onesmartsheep.com";
+export const ORIGIN = "https://keyburn.dev";
 
 let ipCounter = 0;
 

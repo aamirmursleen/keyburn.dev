@@ -13,12 +13,6 @@
   "servers": [
     {
       "url": "https://keyburn.dev/api/v1"
-    },
-    {
-      "url": "https://secret.nafran.com/api/v1"
-    },
-    {
-      "url": "https://secrets.nafran.com/api/v1"
     }
   ],
   "tags": [

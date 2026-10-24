@@ -83,6 +83,10 @@ export interface HardenOptions {
 export function harden(response: Response, kind: ResponseKind, url: URL, options: HardenOptions = {}): Response {
   const secure = !isLocal(url.hostname);
   const headers = new Headers(response.headers);
+  // Static assets serve HTML as plain "text/html"; name the encoding so no client has to guess.
+  if (kind === "page" && headers.get("Content-Type")?.split(";")[0]?.trim().toLowerCase() === "text/html") {
+    headers.set("Content-Type", "text/html; charset=utf-8");
+  }
   const csp = kind === "page" ? pageCsp(url.origin) : [...API_CSP];
   if (secure) {
     if (kind === "page") csp.push("upgrade-insecure-requests");

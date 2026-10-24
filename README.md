@@ -18,11 +18,11 @@
 
 <p align="center">
   <a href="https://github.com/aamirmursleen/keyburn.dev/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/aamirmursleen/keyburn.dev/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Runtime dependencies: 0" src="https://img.shields.io/badge/runtime%20dependencies-0-2D6AD3">
-  <img alt="AES-256-GCM in your browser" src="https://img.shields.io/badge/AES--256--GCM-in%20your%20browser-FF7A1A">
-  <img alt="Cloudflare Workers, Durable Objects and R2" src="https://img.shields.io/badge/Cloudflare-Workers%20·%20Durable%20Objects%20·%20R2-F38020?logo=cloudflare&logoColor=white">
-  <img alt="MCP server for AI agents" src="https://img.shields.io/badge/MCP-for%20AI%20agents-0C1B3F">
-  <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
+  <img alt="Runtime dependencies: 0" src="https://img.shields.io/badge/runtime%20dependencies-0-1B1B39">
+  <img alt="AES-256-GCM in your browser" src="https://img.shields.io/badge/AES--256--GCM-in%20your%20browser-3965FA">
+  <img alt="Cloudflare Workers, Durable Objects and R2" src="https://img.shields.io/badge/Cloudflare-Workers%20·%20Durable%20Objects%20·%20R2-1B1B39?logo=cloudflare&logoColor=FFFFFF">
+  <img alt="MCP server for AI agents" src="https://img.shields.io/badge/MCP-for%20AI%20agents-3965FA">
+  <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-1B1B39?logo=typescript&logoColor=FFFFFF">
 </p>
 
 ---
@@ -39,7 +39,11 @@ so it can't read what you share. And with the `osss` tool, **AI agents like Clau
 secret without ever seeing it.**
 
 <p align="center">
-  <img alt="The KeyBurn web app: share a secret" src=".github/assets/screenshot.png" width="92%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/showcase-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset=".github/assets/showcase-light.png">
+    <img alt="KeyBurn: share a secret from the browser, open it once on any device, or let an AI agent use it without seeing it" src=".github/assets/showcase-light.png" width="100%">
+  </picture>
 </p>
 
 ## ✦ Features
@@ -107,7 +111,7 @@ sequenceDiagram
     K-->>S: Stored in the secret's own Durable Object
     S-->>R: https://…/s#S  (the part after # never leaves a browser)
     R->>K: Token derived from S
-    K-->>R: Ciphertext. One view used; the last view deletes it
+    K-->>R: Ciphertext. One view is used, and the last view deletes it
     R->>R: Decrypt locally
 ```
 
@@ -196,6 +200,8 @@ flowchart LR
 - Playwright end-to-end runs walk every flow (share, open, passphrase, files, receipts, requests,
   inbox, CLI, MCP, hook, WebMCP) and fail if a key, passphrase or plaintext is ever sent to the
   server.
+- An accessibility run checks every page and state against WCAG 2.2 A and AA with axe-core,
+  including colour contrast; text over decorations is measured from the rendered pixels.
 - [CI](https://github.com/aamirmursleen/keyburn.dev/actions/workflows/ci.yml) runs it all on every push.
 
 ## 🚀 Run it locally

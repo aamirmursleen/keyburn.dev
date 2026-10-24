@@ -1,6 +1,7 @@
 # KeyBurn: https://keyburn.dev
 # Public pages and the documents for agents may be crawled. Secret, receipt, request and
-# inbox pages show nothing without the key in their link, and the API is not for crawling.
+# inbox pages may be fetched by agents a person sent a link to: without the key in the link
+# they only explain how to open it, and they are never indexed. The API is not for crawling.
 
 # Crawlers that collect AI training data.
 User-agent: GPTBot
@@ -21,6 +22,10 @@ Allow: /$
 Allow: /request$
 Allow: /security$
 Allow: /agents$
+Allow: /s$
+Allow: /m$
+Allow: /r$
+Allow: /i$
 Allow: /index.md$
 Allow: /request.md$
 Allow: /security.md$
@@ -28,6 +33,7 @@ Allow: /agents.md$
 Allow: /llms.txt$
 Allow: /auth.md$
 Allow: /openapi.json$
+Allow: /cli/
 Allow: /sitemap.xml$
 Allow: /.well-known/
 Disallow: /

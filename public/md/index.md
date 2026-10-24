@@ -24,4 +24,4 @@ Share passwords, API keys and files through links that delete themselves. Everyt
 
 ## For AI agents
 
-Don't open a secret link with a web-fetch tool: the page can't decrypt anything without JavaScript and the key, and fetching it never reveals the secret. Use the local `osss` tool (a CLI and MCP server) instead. It opens links on the user's computer and gives you a handle, never the value. Setup: https://keyburn.dev/agents
+Fetching a secret link never reveals the secret: the key after `#` is never sent to the server, so the page only explains how to open it. Open links with the local `osss` tool (a CLI and MCP server) instead. It opens them on the user's computer and gives you a handle, never the value. Setup: https://keyburn.dev/agents

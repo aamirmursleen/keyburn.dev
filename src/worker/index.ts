@@ -1,6 +1,6 @@
 import { handleApi } from "./api";
 import { HttpError, harden, isLocal, jsonError, logError } from "./http";
-import { prefersMarkdown } from "./negotiate";
+import { asksForHtml, prefersMarkdown } from "./negotiate";
 
 export { Quota } from "./quota";
 export { Vault } from "./vault";
@@ -11,6 +11,12 @@ interface Page {
   markdown?: string;
   /** Public pages may be indexed; the pages that open links never are. */
   indexable?: boolean;
+  /**
+   * A page that opens a link. Agents fetch these links with curl or a fetch tool, which never
+   * sends the key after "#", so clients that don't ask for HTML get the Markdown, which says
+   * how to open the link.
+   */
+  opensLink?: boolean;
 }
 
 /** Exact allowlist: anything not listed here is a 404. */
@@ -19,10 +25,10 @@ const PAGES: Record<string, Page> = {
   "/request": { file: "/request.html", markdown: "/md/request.md", indexable: true },
   "/security": { file: "/security.html", markdown: "/md/security.md", indexable: true },
   "/agents": { file: "/agents.html", markdown: "/md/agents.md", indexable: true },
-  "/s": { file: "/s.html", markdown: "/md/s.md" },
-  "/m": { file: "/m.html" },
-  "/r": { file: "/r.html" },
-  "/i": { file: "/i.html" },
+  "/s": { file: "/s.html", markdown: "/md/s.md", opensLink: true },
+  "/m": { file: "/m.html", markdown: "/md/m.md", opensLink: true },
+  "/r": { file: "/r.html", markdown: "/md/r.md", opensLink: true },
+  "/i": { file: "/i.html", markdown: "/md/i.md", opensLink: true },
 };
 
 const MARKDOWN = "text/markdown; charset=utf-8";
@@ -57,6 +63,9 @@ const DISCOVERY_LINKS = [
   '</llms.txt>; rel="describedby"; type="text/markdown"',
   '</.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/json"',
 ];
+
+/** The first hosts, before keyburn.dev. */
+const LEGACY_HOSTS = new Set(["secret.nafran.com", "secrets.nafran.com"]);
 
 const ROOT_FILES = new Set(["/favicon.svg", "/.well-known/security.txt"]);
 const ASSET = /^\/assets\/[a-z0-9-]+\.(?:js|css|svg)$/;
@@ -117,7 +126,8 @@ function withType(response: Response, type: string): Response {
 }
 
 async function servePage(request: Request, env: Env, url: URL, page: Page): Promise<Response> {
-  if (page.markdown && prefersMarkdown(request.headers.get("accept"))) {
+  const accept = request.headers.get("accept");
+  if (page.markdown && (prefersMarkdown(accept) || (page.opensLink && !asksForHtml(accept)))) {
     const file = await fetchAsset(env, page.markdown, request, false, "GET");
     if (file.ok) {
       const text = await file.text();
@@ -183,9 +193,14 @@ async function serveStatic(request: Request, env: Env, url: URL): Promise<Respon
 export default {
   async fetch(request, env, ctx): Promise<Response> {
     const url = new URL(request.url);
-    if (url.hostname === "www.keyburn.dev") {
+    // Everything people visit lives on keyburn.dev. Browsers keep the "#..." part of a link
+    // across a redirect, so links made on the first hosts still open there. Those hosts keep
+    // their API and CLI files for the osss versions and links that name them.
+    const legacyPage = LEGACY_HOSTS.has(url.hostname) && !url.pathname.startsWith("/api/") && !url.pathname.startsWith("/cli/");
+    if (url.hostname === "www.keyburn.dev" || legacyPage) {
       url.hostname = "keyburn.dev";
       url.protocol = "https:";
+      url.port = "";
       return harden(Response.redirect(url.toString(), 301), "api", url);
     }
     if (url.protocol === "http:" && !isLocal(url.hostname)) {

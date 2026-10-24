@@ -1,6 +1,7 @@
 // Accept-header negotiation between a page's HTML and its Markdown version for agents.
-// Browsers never ask for text/markdown, so Markdown is served only when the client names it
-// explicitly and doesn't prefer HTML.
+// Browsers never ask for text/markdown, so Markdown is served when the client names it
+// explicitly and doesn't prefer HTML. Pages that open links also serve it to clients that
+// don't ask for HTML at all (curl, scripts, most agent tools).
 
 interface Range {
   type: string;
@@ -40,4 +41,11 @@ export function prefersMarkdown(accept: string | null): boolean {
   const ranges = parseAccept(accept);
   const markdown = quality(ranges, "text", "markdown");
   return markdown.explicit && markdown.q > 0 && markdown.q >= quality(ranges, "text", "html").q;
+}
+
+/** True when the client names HTML (or XHTML) explicitly, as every browser navigation does. */
+export function asksForHtml(accept: string | null): boolean {
+  if (!accept) return false;
+  const ranges = parseAccept(accept);
+  return [quality(ranges, "text", "html"), quality(ranges, "application", "xhtml+xml")].some((m) => m.explicit && m.q > 0);
 }

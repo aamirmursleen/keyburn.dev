@@ -33,7 +33,7 @@ describe("security headers", () => {
   it("turns unexpected failures into a hardened, generic 500", async () => {
     const broken = { ...env, ASSETS: { fetch: () => Promise.reject(new Error("assets down")) } } as unknown as Env;
     const res = await worker.fetch(
-      new Request("https://secret.onesmartsheep.com/") as Request<unknown, IncomingRequestCfProperties>,
+      new Request("https://keyburn.dev/") as Request<unknown, IncomingRequestCfProperties>,
       broken,
       createExecutionContext(),
     );
@@ -48,10 +48,32 @@ describe("security headers", () => {
     expect(res.headers.get("location")).toBe("https://keyburn.dev/s?x=1");
   });
 
+  it("sends visits to the first hosts to keyburn.dev, but keeps their API and CLI files", async () => {
+    for (const host of ["secret.nafran.com", "secrets.nafran.com"]) {
+      for (const [from, to] of [
+        [`https://${host}/s?x=1`, "https://keyburn.dev/s?x=1"],
+        [`http://${host}/`, "https://keyburn.dev/"],
+        [`https://${host}/robots.txt`, "https://keyburn.dev/robots.txt"],
+      ]) {
+        const res = await fetchPage(from as string, { redirect: "manual" });
+        expect(res.status, from).toBe(301);
+        expect(res.headers.get("location"), from).toBe(to);
+      }
+      const api = await fetchPage(`https://${host}/api/v1/secret/meta`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ id: "x", metaToken: "y" }),
+      });
+      expect(api.status).not.toBe(301);
+      expect(api.headers.get("content-type")).toContain("application/json");
+      await api.arrayBuffer();
+    }
+  });
+
   it("redirects plain HTTP to HTTPS, keeping the path", async () => {
-    const res = await fetchPage("http://secret.onesmartsheep.com/s", { redirect: "manual" });
+    const res = await fetchPage("http://keyburn.dev/s", { redirect: "manual" });
     expect(res.status).toBe(301);
-    expect(res.headers.get("location")).toBe("https://secret.onesmartsheep.com/s");
+    expect(res.headers.get("location")).toBe("https://keyburn.dev/s");
   });
 
   it("drops HSTS and insecure-request upgrades on localhost for development", async () => {
@@ -64,14 +86,14 @@ describe("security headers", () => {
 describe.skipIf(!("ASSETS" in env))("pages", () => {
   it("serves pages with a strict CSP and Trusted Types", async () => {
     for (const path of ["/", "/s", "/m", "/request", "/r", "/i", "/security", "/agents"]) {
-      const res = await fetchPage(`https://secret.onesmartsheep.com${path}`, { headers: { accept: "text/html,*/*;q=0.8" } });
+      const res = await fetchPage(`https://keyburn.dev${path}`, { headers: { accept: "text/html,*/*;q=0.8" } });
       expect(res.status, path).toBe(200);
-      expect(res.headers.get("content-type")).toContain("text/html");
+      expect(res.headers.get("content-type")).toBe("text/html; charset=utf-8");
       const csp = res.headers.get("content-security-policy") ?? "";
       // Pinned to the app's own files: other same-origin paths (e.g. /cdn-cgi/) are not allowed.
-      expect(csp).toContain("script-src https://secret.onesmartsheep.com/assets/app.js;");
-      expect(csp).toContain("connect-src https://secret.onesmartsheep.com/api/v1/;");
-      expect(csp).toContain("font-src https://secret.onesmartsheep.com/assets/fonts/;");
+      expect(csp).toContain("script-src https://keyburn.dev/assets/app.js;");
+      expect(csp).toContain("connect-src https://keyburn.dev/api/v1/;");
+      expect(csp).toContain("font-src https://keyburn.dev/assets/fonts/;");
       expect(csp).not.toContain("'self'");
       expect(csp).toContain("require-trusted-types-for 'script'");
       expect(csp).not.toContain("unsafe-inline");
@@ -87,24 +109,66 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
   });
 
   it("serves Markdown versions to agents that ask for them", async () => {
-    for (const path of ["/", "/request", "/security", "/agents", "/s"]) {
-      const res = await fetchPage(`https://secret.onesmartsheep.com${path}`, { headers: { accept: "text/markdown, text/html;q=0.9" } });
+    for (const path of ["/", "/request", "/security", "/agents", "/s", "/m", "/r", "/i"]) {
+      const res = await fetchPage(`https://keyburn.dev${path}`, { headers: { accept: "text/markdown, text/html;q=0.9" } });
       expect(res.status, path).toBe(200);
       expect(res.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
       expect(res.headers.get("vary")).toBe("Accept");
       expect(Number(res.headers.get("x-markdown-tokens"))).toBeGreaterThan(50);
       expect(res.headers.get("content-security-policy")).toContain("default-src 'none'");
-      expectHardened(res.headers, { indexable: path !== "/s", crossOrigin: path !== "/s" });
+      const indexable = ["/", "/request", "/security", "/agents"].includes(path);
+      expectHardened(res.headers, { indexable, crossOrigin: indexable });
       expect(await res.text()).toMatch(/^# /);
     }
-    const html = await fetchPage("https://secret.onesmartsheep.com/", { headers: { accept: "text/html" } });
+    const html = await fetchPage("https://keyburn.dev/", { headers: { accept: "text/html" } });
     expect(html.headers.get("vary")).toContain("Accept");
     expect(html.headers.get("content-type")).toContain("text/html");
     await html.arrayBuffer();
-    // Pages that open receipts, requests and inboxes have no Markdown version.
-    const receipt = await fetchPage("https://secret.onesmartsheep.com/m", { headers: { accept: "text/markdown" } });
-    expect(receipt.headers.get("content-type")).toContain("text/html");
-    await receipt.arrayBuffer();
+  });
+
+  it("tells agents and scripts how to open a link when they don't ask for HTML", async () => {
+    // curl, scripts and agent fetch tools never send the key after "#", and rarely ask for HTML.
+    const clients: (string | null)[] = [null, "*/*", "application/json, */*;q=0.5", "text/plain"];
+    for (const path of ["/s", "/m", "/r", "/i"]) {
+      for (const accept of clients) {
+        const res = await fetchPage(`https://keyburn.dev${path}`, accept === null ? {} : { headers: { accept } });
+        expect(res.status, `${path} ${accept}`).toBe(200);
+        expect(res.headers.get("content-type"), `${path} ${accept}`).toBe("text/markdown; charset=utf-8");
+        expect(res.headers.get("vary")).toBe("Accept");
+        expectHardened(res.headers);
+        expect(await res.text()).toMatch(/^# KeyBurn (secret|receipt|request|inbox) link\n/);
+      }
+      // Browsers always ask for HTML, so people still get the page.
+      for (const accept of ["text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "application/xhtml+xml"]) {
+        const res = await fetchPage(`https://keyburn.dev${path}`, { headers: { accept } });
+        expect(res.headers.get("content-type"), `${path} ${accept}`).toContain("text/html");
+        expect(res.headers.get("vary")).toContain("Accept");
+        await res.arrayBuffer();
+      }
+    }
+    // Public pages stay HTML for clients like link previewers.
+    for (const accept of [null, "*/*"]) {
+      const res = await fetchPage("https://keyburn.dev/", accept === null ? {} : { headers: { accept } });
+      expect(res.headers.get("content-type")).toContain("text/html");
+      await res.arrayBuffer();
+    }
+    const head = await fetchPage("https://keyburn.dev/s", { method: "HEAD", headers: { accept: "*/*" } });
+    expect(head.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
+    expect(await head.text()).toBe("");
+  });
+
+  it("gives agents a working, pinned way to open a secret link", async () => {
+    const markdown = await (await fetchPage("https://keyburn.dev/s", { headers: { accept: "*/*" } })).text();
+    const html = await (await fetchPage("https://keyburn.dev/s", { headers: { accept: "text/html" } })).text();
+    for (const text of [markdown, html]) {
+      expect(text).toMatch(/https:\/\/keyburn\.dev\/cli\/osss-\d+\.\d+\.\d+\.mjs/);
+      expect(text).toMatch(/[0-9a-f]{64} {2}osss\.download" \| shasum -a 256 -c/);
+      expect(text).toContain("| node ~/.osss/osss.mjs open -");
+    }
+    expect(markdown).toContain("node ~/.osss/osss.mjs run <handle> -- <command>");
+    expect(html).toContain("node ~/.osss/osss.mjs run &lt;handle&gt; -- &lt;command&gt;");
+    // Agents are told to install osss and open the link, not to stop and wait.
+    expect(markdown).not.toMatch(/approval/i);
   });
 
   it("serves the discovery documents for crawlers and agents", async () => {
@@ -122,27 +186,28 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       ["/.well-known/agent-skills/osss/SKILL.md", "text/markdown; charset=utf-8", true],
     ];
     for (const [path, type, crossOrigin] of docs) {
-      const res = await fetchPage(`https://secret.onesmartsheep.com${path}`);
+      const res = await fetchPage(`https://keyburn.dev${path}`);
       expect(res.status, path).toBe(200);
       expect(res.headers.get("content-type"), path).toBe(type);
       expectHardened(res.headers, { indexable: true, crossOrigin });
       await res.arrayBuffer();
     }
-    const robots = await (await fetchPage("https://secret.onesmartsheep.com/robots.txt")).text();
+    const robots = await (await fetchPage("https://keyburn.dev/robots.txt")).text();
     expect(robots).toMatch(/^Content-Signal: search=yes, ai-input=yes, ai-train=no$/m);
     expect(robots).toMatch(/^Sitemap: https:\/\/keyburn\.dev\/sitemap\.xml$/m);
     expect(robots).toMatch(/^Disallow: \/$/m);
-    const catalog = await (await fetchPage("https://secret.onesmartsheep.com/.well-known/api-catalog")).json<{ linkset: Record<string, unknown>[] }>();
+    for (const path of ["/s", "/m", "/r", "/i"]) expect(robots).toContain(`\nAllow: ${path}$\n`);
+    const catalog = await (await fetchPage("https://keyburn.dev/.well-known/api-catalog")).json<{ linkset: Record<string, unknown>[] }>();
     expect(Object.keys(catalog.linkset[0]!)).toEqual(["anchor", "service-desc", "service-doc", "status"]);
-    const ard = await (await fetchPage("https://secret.onesmartsheep.com/.well-known/ai-catalog.json")).json<{ entries: Record<string, unknown>[] }>();
+    const ard = await (await fetchPage("https://keyburn.dev/.well-known/ai-catalog.json")).json<{ entries: Record<string, unknown>[] }>();
     for (const entry of ard.entries) {
       expect(entry.identifier).toMatch(/^urn:air:keyburn\.dev:/);
       expect("url" in entry !== "data" in entry).toBe(true);
     }
-    const index = await (await fetchPage("https://secret.onesmartsheep.com/.well-known/agent-skills/index.json")).json<{
+    const index = await (await fetchPage("https://keyburn.dev/.well-known/agent-skills/index.json")).json<{
       skills: { url: string; digest: string }[];
     }>();
-    const skill = await fetchPage(`https://secret.onesmartsheep.com${new URL(index.skills[0]!.url).pathname}`);
+    const skill = await fetchPage(`https://keyburn.dev${new URL(index.skills[0]!.url).pathname}`);
     const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await skill.arrayBuffer()));
     expect(index.skills[0]!.digest).toBe(`sha256:${[...digest].map((b) => b.toString(16).padStart(2, "0")).join("")}`);
   });
@@ -154,7 +219,7 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
   });
 
   it("serves the bundle with revalidation and no-transform", async () => {
-    const res = await fetchPage("https://secret.onesmartsheep.com/assets/app.js");
+    const res = await fetchPage("https://keyburn.dev/assets/app.js");
     expect(res.status).toBe(200);
     expect(res.headers.get("cache-control")).toBe("no-cache, no-transform");
     expectHardened(res.headers);
@@ -171,30 +236,30 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       ["/assets/brand/fire.webm", "video/webm"],
       ["/assets/brand/burn-mask.svg", "image/svg+xml"],
     ]) {
-      const res = await fetchPage(`https://secret.onesmartsheep.com${path}`);
+      const res = await fetchPage(`https://keyburn.dev${path}`);
       expect(res.status, path).toBe(200);
       expect(res.headers.get("content-type"), path).toBe(type);
       expectHardened(res.headers);
       await res.arrayBuffer();
     }
-    const range = await fetchPage("https://secret.onesmartsheep.com/assets/brand/fire.mp4", { headers: { range: "bytes=0-99" } });
+    const range = await fetchPage("https://keyburn.dev/assets/brand/fire.mp4", { headers: { range: "bytes=0-99" } });
     expect(range.status).toBe(206);
     expect(range.headers.get("content-range")).toMatch(/^bytes 0-99\//);
     expect((await range.arrayBuffer()).byteLength).toBe(100);
-    const tail = await fetchPage("https://secret.onesmartsheep.com/assets/brand/fire.mp4", { headers: { range: "bytes=-10" } });
+    const tail = await fetchPage("https://keyburn.dev/assets/brand/fire.mp4", { headers: { range: "bytes=-10" } });
     expect(tail.status).toBe(206);
     expect((await tail.arrayBuffer()).byteLength).toBe(10);
-    const beyond = await fetchPage("https://secret.onesmartsheep.com/assets/brand/fire.mp4", { headers: { range: "bytes=99999999-" } });
+    const beyond = await fetchPage("https://keyburn.dev/assets/brand/fire.mp4", { headers: { range: "bytes=99999999-" } });
     expect(beyond.status).toBe(416);
     await beyond.arrayBuffer();
-    const page = await fetchPage("https://secret.onesmartsheep.com/");
-    expect(page.headers.get("content-security-policy")).toContain("media-src https://secret.onesmartsheep.com/assets/brand/;");
-    expect(page.headers.get("content-security-policy")).toContain("img-src https://secret.onesmartsheep.com/assets/logo.svg https://secret.onesmartsheep.com/favicon.svg https://secret.onesmartsheep.com/assets/brand/;");
+    const page = await fetchPage("https://keyburn.dev/");
+    expect(page.headers.get("content-security-policy")).toContain("media-src https://keyburn.dev/assets/brand/;");
+    expect(page.headers.get("content-security-policy")).toContain("img-src https://keyburn.dev/assets/logo.svg https://keyburn.dev/favicon.svg https://keyburn.dev/assets/brand/;");
     await page.arrayBuffer();
   });
 
   it("serves the self-hosted fonts as woff2", async () => {
-    const res = await fetchPage("https://secret.onesmartsheep.com/assets/fonts/poppins-400-latin.woff2");
+    const res = await fetchPage("https://keyburn.dev/assets/fonts/poppins-400-latin.woff2");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe("font/woff2");
     expectHardened(res.headers);
@@ -202,10 +267,10 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
   });
 
   it("serves the agent tool as plain text that browsers won't run", async () => {
-    const sumsFile = await fetchPage("https://secret.onesmartsheep.com/cli/SHA256SUMS");
+    const sumsFile = await fetchPage("https://keyburn.dev/cli/SHA256SUMS");
     const [, release] = (await sumsFile.text()).trim().split(/\s+/);
     for (const path of [`/cli/${release}`, "/cli/SHA256SUMS"]) {
-      const res = await fetchPage(`https://secret.onesmartsheep.com${path}`);
+      const res = await fetchPage(`https://keyburn.dev${path}`);
       expect(res.status, path).toBe(200);
       expect(res.headers.get("content-type")).toBe("text/plain; charset=utf-8");
       expect(res.headers.get("cache-control")).toBe("no-cache, no-transform");
@@ -213,9 +278,9 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       expectHardened(res.headers);
       await res.arrayBuffer();
     }
-    const sums = await (await fetchPage("https://secret.onesmartsheep.com/cli/SHA256SUMS")).text();
+    const sums = await (await fetchPage("https://keyburn.dev/cli/SHA256SUMS")).text();
     const [hash, name] = sums.trim().split(/\s+/);
-    const versioned = await fetchPage(`https://secret.onesmartsheep.com/cli/${name}`);
+    const versioned = await fetchPage(`https://keyburn.dev/cli/${name}`);
     const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await versioned.arrayBuffer()));
     expect([...digest].map((b) => b.toString(16).padStart(2, "0")).join("")).toBe(hash);
   });
@@ -247,7 +312,7 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       "/.well-known/",
       "/.well-known/agent-skills/osss/",
     ]) {
-      const res = await fetchPage(`https://secret.onesmartsheep.com${path}`);
+      const res = await fetchPage(`https://keyburn.dev${path}`);
       expect(res.status, path).toBe(404);
       expectHardened(res.headers);
       await res.arrayBuffer();
@@ -255,7 +320,7 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
   });
 
   it("only allows GET and HEAD for pages", async () => {
-    const res = await fetchPage("https://secret.onesmartsheep.com/", { method: "POST" });
+    const res = await fetchPage("https://keyburn.dev/", { method: "POST" });
     expect(res.status).toBe(405);
     await res.arrayBuffer();
   });

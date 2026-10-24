@@ -14,16 +14,16 @@
     @keyframes eat { 0%, 16% { transform: translateX(0) } 60%, 80% { transform: translateX(-236px) } 100% { transform: translateX(0) } }
     .flicker { animation: flicker 1.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 90%; }
     @keyframes flicker { from { transform: scale(1, 1) } to { transform: scale(.94, 1.08) } }
-    @media (prefers-reduced-motion: reduce) { .ember, .eat, .edge, .flicker { animation: none } .ember { opacity: .7 } }
+    @media (prefers-reduced-motion: reduce) { .ember, .eat, .edge, .flicker { animation: none } .ember { opacity: 0 } }
     </style>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E7EEFC"/></linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FF7A1A" stop-opacity="0.22"/><stop offset="1" stop-color="#FF7A1A" stop-opacity="0"/></radialGradient>
-    <radialGradient id="blueglow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#2D6AD3" stop-opacity=".45"/><stop offset="1" stop-color="#2D6AD3" stop-opacity="0"/></radialGradient>
-    <linearGradient id="fire" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF5A1F"/><stop offset=".55" stop-color="#FF9A3D"/><stop offset="1" stop-color="#FFD27A"/></linearGradient>
-    <linearGradient id="dev" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF7A1A"/><stop offset="1" stop-color="#FFB547"/></linearGradient>
-    <linearGradient id="char" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF7A1A" stop-opacity="0"/><stop offset=".55" stop-color="#FF7A1A" stop-opacity=".9"/><stop offset="1" stop-color="#FFD27A"/></linearGradient>
-    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.4" fill="#9DB4E6" opacity="0.35"/></pattern>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E9EBFF"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#99B7FC" stop-opacity="0.45"/><stop offset="1" stop-color="#99B7FC" stop-opacity="0"/></radialGradient>
+    <radialGradient id="blueglow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#3965FA" stop-opacity=".22"/><stop offset="1" stop-color="#3965FA" stop-opacity="0"/></radialGradient>
+    <linearGradient id="fire" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#99B7FC"/><stop offset=".55" stop-color="#E9EBFF"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient>
+    <linearGradient id="dev" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3965FA"/><stop offset="1" stop-color="#3965FA"/></linearGradient>
+    <linearGradient id="char" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3965FA" stop-opacity="0"/><stop offset=".55" stop-color="#3965FA" stop-opacity=".9"/><stop offset="1" stop-color="#99B7FC"/></linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.4" fill="#99B7FC" opacity="0.35"/></pattern>
     <clipPath id="barclip"><rect x="780" y="196" width="404" height="64" rx="32"/></clipPath>
     <mask id="eatmask"><rect class="eat" x="780" y="196" width="404" height="64" fill="#fff"/></mask>
   </defs>
@@ -34,49 +34,49 @@
 
   <!-- mark -->
   <g transform="translate(96 96)">
-    <rect width="76" height="76" rx="22" fill="#2D6AD3"/>
+    <rect width="76" height="76" rx="22" fill="#3965FA"/>
     <g transform="translate(14 12)">
       <path class="flicker" d="M24 50c-9 0-16-6-16-15 0-7.5 5.4-12.3 9-16.8.6 4.6 3.2 6.8 6 7.6C22.8 17.2 26 9.6 32.8 5c-.9 7.3 2.5 12.3 5.9 16.8 2.7 3.6 5.3 7.5 5.3 12.5C44 43.8 34.9 50 24 50z" fill="url(#fire)"/>
-      <circle cx="25" cy="36" r="5.5" fill="#2D6AD3"/>
-      <rect x="23" y="38" width="4" height="9" rx="2" fill="#2D6AD3"/>
+      <circle cx="25" cy="36" r="5.5" fill="#3965FA"/>
+      <rect x="23" y="38" width="4" height="9" rx="2" fill="#3965FA"/>
     </g>
   </g>
 
-  <text x="92" y="282" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="700" font-size="100" letter-spacing="-3" fill="#0C1B3F">keyburn<tspan fill="url(#dev)">.dev</tspan></text>
-  <text x="96" y="340" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="32" fill="#0C1B3F">Secret links that burn after reading.</text>
-  <text x="96" y="382" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="400" font-size="20" fill="#33456F">Encrypted in your browser. The key lives in the link, never on the server.</text>
+  <text x="92" y="282" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="700" font-size="100" letter-spacing="-3" fill="#1B1B39">keyburn<tspan fill="url(#dev)">.dev</tspan></text>
+  <text x="96" y="340" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="32" fill="#1B1B39">Secret links that burn after reading.</text>
+  <text x="96" y="382" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="400" font-size="20" fill="#1B1B39">Encrypted in your browser. The key lives in the link, never on the server.</text>
 
   
   <g transform="translate(96 428)">
-    <rect width="212" height="46" rx="23" fill="#FFFFFF" stroke="#C9D7F5"/>
-    <g transform="translate(18 12)" fill="none" stroke="#FF8A3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="18" height="12" rx="3"/><path d="M6 9V6.5a5 5 0 0 1 10 0V9"/></g>
-    <text x="50" y="30" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#1D2F5C">AES-256-GCM</text>
+    <rect width="212" height="46" rx="23" fill="#FFFFFF" stroke="#99B7FC"/>
+    <g transform="translate(18 12)" fill="none" stroke="#3965FA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="18" height="12" rx="3"/><path d="M6 9V6.5a5 5 0 0 1 10 0V9"/></g>
+    <text x="50" y="30" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#1B1B39">AES-256-GCM</text>
   </g>
   
   <g transform="translate(324 428)">
-    <rect width="252" height="46" rx="23" fill="#FFFFFF" stroke="#C9D7F5"/>
-    <g transform="translate(18 12)" fill="none" stroke="#FF8A3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21c-4 0-7-2.7-7-6.6 0-3.3 2.4-5.4 4-7.4.3 2 1.4 3 2.6 3.3C10.6 6.8 12 3.5 15 1.5c-.4 3.2 1.1 5.4 2.6 7.4 1.2 1.6 2.4 3.3 2.4 5.5C20 18.3 15.9 21 11 21z"/></g>
-    <text x="50" y="30" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#1D2F5C">One view, then gone</text>
+    <rect width="252" height="46" rx="23" fill="#FFFFFF" stroke="#99B7FC"/>
+    <g transform="translate(18 12)" fill="none" stroke="#3965FA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21c-4 0-7-2.7-7-6.6 0-3.3 2.4-5.4 4-7.4.3 2 1.4 3 2.6 3.3C10.6 6.8 12 3.5 15 1.5c-.4 3.2 1.1 5.4 2.6 7.4 1.2 1.6 2.4 3.3 2.4 5.5C20 18.3 15.9 21 11 21z"/></g>
+    <text x="50" y="30" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#1B1B39">One view, then gone</text>
   </g>
   
   <g transform="translate(592 428)">
-    <rect width="262" height="46" rx="23" fill="#FFFFFF" stroke="#C9D7F5"/>
-    <g transform="translate(18 12)" fill="none" stroke="#FF8A3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="16" height="13" rx="4"/><path d="M11 3v4M7.5 13h.01M14.5 13h.01M8 17h6"/></g>
-    <text x="50" y="30" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#1D2F5C">MCP for AI agents</text>
+    <rect width="262" height="46" rx="23" fill="#FFFFFF" stroke="#99B7FC"/>
+    <g transform="translate(18 12)" fill="none" stroke="#3965FA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="16" height="13" rx="4"/><path d="M11 3v4M7.5 13h.01M14.5 13h.01M8 17h6"/></g>
+    <text x="50" y="30" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#1B1B39">MCP for AI agents</text>
   </g>
 
-  <text x="96" y="540" font-family="KBMono, ui-monospace, Menlo, Consolas, monospace" font-size="17" fill="#5C6E96">zero-knowledge · Cloudflare Workers · Durable Objects · R2 · 0 runtime dependencies</text>
+  <text x="96" y="540" font-family="KBMono, ui-monospace, Menlo, Consolas, monospace" font-size="17" fill="#3965FA">zero-knowledge · Cloudflare Workers · Durable Objects · R2 · 0 runtime dependencies</text>
 
   <!-- the link that burns -->
   <g>
-    <rect x="780" y="196" width="404" height="64" rx="32" fill="#FFFFFF" stroke="#2D6AD3" stroke-width="2"/>
+    <rect x="780" y="196" width="404" height="64" rx="32" fill="#FFFFFF" stroke="#3965FA" stroke-width="2"/>
     <g clip-path="url(#barclip)">
       <g mask="url(#eatmask)">
-        <text x="808" y="235" font-family="KBMono, ui-monospace, Menlo, Consolas, monospace" font-size="20" fill="#0C1B3F">keyburn.dev/s#<tspan fill="#FF8A3D" font-weight="700">k3Yq9vLm2T8x</tspan></text>
+        <text x="808" y="235" font-family="KBMono, ui-monospace, Menlo, Consolas, monospace" font-size="20" fill="#1B1B39">keyburn.dev/s#<tspan fill="#3965FA" font-weight="700">k3Yq9vLm2T8x</tspan></text>
       </g>
       <g class="edge"><rect x="1136" y="196" width="48" height="64" fill="url(#char)"/></g>
     </g>
-    <circle class="ember e0" cx="960" cy="210" r="4" fill="#FFB547"/><circle class="ember e1" cx="990" cy="200" r="3" fill="#FF7A1A"/><circle class="ember e2" cx="1018" cy="214" r="3.5" fill="#FFD27A"/><circle class="ember e3" cx="1044" cy="204" r="2.5" fill="#FF7A1A"/><circle class="ember e4" cx="1070" cy="212" r="3" fill="#FFB547"/><circle class="ember e5" cx="1096" cy="202" r="2.5" fill="#FF9A3D"/><circle class="ember e0" cx="1120" cy="210" r="3" fill="#FFD27A"/><circle class="ember e1" cx="976" cy="222" r="2" fill="#FF7A1A"/><circle class="ember e2" cx="1032" cy="226" r="2" fill="#FFB547"/><circle class="ember e3" cx="1084" cy="224" r="2" fill="#FF7A1A"/><circle class="ember e4" cx="1108" cy="228" r="2.5" fill="#FFB547"/><circle class="ember e5" cx="1002" cy="228" r="2" fill="#FFD27A"/>
+    <circle class="ember e0" cx="960" cy="210" r="4" fill="#99B7FC"/><circle class="ember e1" cx="990" cy="200" r="3" fill="#3965FA"/><circle class="ember e2" cx="1018" cy="214" r="3.5" fill="#99B7FC"/><circle class="ember e3" cx="1044" cy="204" r="2.5" fill="#3965FA"/><circle class="ember e4" cx="1070" cy="212" r="3" fill="#99B7FC"/><circle class="ember e5" cx="1096" cy="202" r="2.5" fill="#3965FA"/><circle class="ember e0" cx="1120" cy="210" r="3" fill="#99B7FC"/><circle class="ember e1" cx="976" cy="222" r="2" fill="#3965FA"/><circle class="ember e2" cx="1032" cy="226" r="2" fill="#99B7FC"/><circle class="ember e3" cx="1084" cy="224" r="2" fill="#3965FA"/><circle class="ember e4" cx="1108" cy="228" r="2.5" fill="#99B7FC"/><circle class="ember e5" cx="1002" cy="228" r="2" fill="#99B7FC"/>
   </g>
-  <text x="784" y="296" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="400" font-size="17" fill="#5C6E96">opened once → deleted for good</text>
+  <text x="784" y="296" font-family="KBPoppins, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="400" font-size="17" fill="#3965FA">opened once → deleted for good</text>
 </svg>

@@ -16,7 +16,7 @@ npm run dev            # builds the client, runs wrangler dev on http://localhos
 npm test               # Worker/Durable Object/crypto tests in workerd, then the CLI tests in Node
 npm run test:coverage  # coverage reports (thresholds: 80% lines/functions/statements)
 npm run typecheck      # client, worker, CLI and tests
-npm run build && npm run e2e   # Playwright end-to-end runs (browser, then CLI and MCP), with leak checks
+npm run build && npm run e2e   # Playwright runs: browser flows, CLI and MCP, WCAG 2.2 AA accessibility
 ```
 
 `npm run dev` needs a `.dev.vars` file containing `IP_HASH_SECRET=<random string>` (gitignored).
@@ -24,8 +24,9 @@ npm run build && npm run e2e   # Playwright end-to-end runs (browser, then CLI a
 ## Current deployment
 
 - **Live at https://keyburn.dev** (`www.keyburn.dev` redirects to it). The first hosts,
-  `secret.nafran.com` and `secrets.nafran.com`, stay on the same Worker so links created there keep
-  working; links point to whichever host they were created on. Worker `osss-secret`,
+  `secret.nafran.com` and `secrets.nafran.com`, stay on the same Worker: page visits redirect to
+  keyburn.dev (browsers keep the `#…` part, so old links still open), while their API and CLI files
+  keep working for osss and the links that name them. Worker `osss-secret`,
   R2 bucket `osss-secret-files` (9-day safety-net lifecycle rule), secret `IP_HASH_SECRET` set.
   The Cloudflare account is taken from `CLOUDFLARE_ACCOUNT_ID` in the gitignored `.env` file.
 - Redeploy after changes with `npm run deploy` (type checks, tests, build and the browser test

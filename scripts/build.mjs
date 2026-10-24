@@ -51,7 +51,14 @@ for (const name of await readdir("public/cli")) {
 const sha256 = createHash("sha256").update(await readFile(outfile)).digest("hex");
 
 // Pages that tell people what to download and which fingerprint to expect.
-const PINNED_DOCS = ["public/agents.html", "public/md/agents.md", "public/.well-known/agent-skills/osss/SKILL.md", "README.md"];
+const PINNED_DOCS = [
+  "public/agents.html",
+  "public/md/agents.md",
+  "public/s.html",
+  "public/md/s.md",
+  "public/.well-known/agent-skills/osss/SKILL.md",
+  "README.md",
+];
 const FILE_REF = /osss-\d+\.\d+\.\d+\.mjs/g;
 const HASH_REF = /[0-9a-f]{64}(?=  osss\.download)/g;
 

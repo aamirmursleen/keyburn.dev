@@ -1,6 +1,6 @@
 # Security design
 
-This document describes how **secret.onesmartsheep.com** protects what people share, what the
+This document describes how **keyburn.dev** protects what people share, what the
 server can and cannot see, and the limits of the design. Protocol identifier: `osss/v1`.
 
 ## Goals

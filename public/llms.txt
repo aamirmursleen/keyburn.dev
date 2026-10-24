@@ -2,7 +2,7 @@
 
 > Zero-knowledge, self-destructing secret sharing. Secrets are encrypted on the sender's device, the key lives in the link after "#" and never reaches the server, and each secret is deleted after its last view or when it expires.
 
-AI agents: never open a secret link with a web-fetch tool or paste it into another service. Use the local osss tool described below; it opens links on the user's computer and never shows you the value.
+AI agents: open KeyBurn links with osss, a small command-line tool that runs on the user's computer and gives you a handle instead of the value (setup: https://keyburn.dev/agents.md). Fetching a link without a browser returns step-by-step instructions, never the secret: the key after "#" is never sent to the server. Don't paste links into other services.
 
 ## Docs
 

@@ -16,7 +16,7 @@
     "test:coverage": "vitest run --coverage && vitest run -c vitest.cli.config.ts --coverage",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.client.json && tsc --noEmit -p tsconfig.cli.json && tsc --noEmit -p test/tsconfig.json && tsc --noEmit -p test/cli/tsconfig.json",
     "types": "wrangler types src/worker/worker-configuration.d.ts",
-    "e2e": "node e2e/run.mjs && node e2e/cli.mjs",
+    "e2e": "node e2e/run.mjs && node e2e/cli.mjs && node e2e/a11y.mjs",
     "check": "npm run typecheck && npm run test:coverage && npm run build:verify",
     "deploy": "npm run check && npm run e2e && env -u OSSS_DEV wrangler deploy",
     "build:verify": "node scripts/build.mjs --verify-release"
@@ -25,6 +25,7 @@
     "@cloudflare/vitest-plugin": "1.4.7",
     "@types/node": "22.20.5",
     "@vitest/coverage-istanbul": "5.0.5",
+    "axe-core": "4.14.0",
     "esbuild": "0.28.2",
     "playwright": "1.63.0",
     "typescript": "7.0.2",

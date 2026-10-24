@@ -4,7 +4,7 @@
 // must never appear in any request the browser sends.
 //
 // Usage: npm run build && npm run e2e
-//        E2E_BASE=https://secret.onesmartsheep.com npm run e2e   (smoke-test a live deployment)
+//        E2E_BASE=https://keyburn.dev npm run e2e   (smoke-test a live deployment)
 
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

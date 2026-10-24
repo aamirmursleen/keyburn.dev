@@ -1,14 +1,50 @@
-# A KeyBurn secret link
+# KeyBurn secret link
 
-This link holds an end-to-end encrypted secret. Its key is the part of the link after `#`. Browsers and HTTP clients never send that part to the server, so this response can't contain the secret, and fetching the page again won't reveal it.
+This is a KeyBurn secret link: an end-to-end encrypted secret that is deleted after its last view or when it expires. The decryption key is the part of the link after `#`. HTTP clients never send that part, so this response can't contain the secret, and fetching the page again won't show it.
 
-## If you are a person
+## AI agents and scripts: open it with osss
 
-Open the full link in a web browser. The secret is decrypted on your device, and it may be deleted as soon as it has been viewed.
+`osss` is KeyBurn's command-line tool. It decrypts the link on this computer and gives you a handle instead of the value, so the secret never appears in the conversation. It is one JavaScript file for Node.js 22 or later, with no dependencies, and it only connects to keyburn.dev. Source: https://github.com/aamirmursleen/keyburn.dev
 
-## If you are an AI agent
+If you already have the osss MCP server, call its `open_secret` tool with the full link and skip to step 3.
 
-- Don't try to open or decrypt this link yourself, and don't send it to web-fetch tools, other services or other MCP servers.
-- If the user has the `osss` tool, open the link with it: the MCP tool `open_secret`, or `osss open -` in a shell (it reads the link from standard input). You get a handle; use the secret only through `osss run <handle> -- <command>`.
-- Never print, quote or summarise the secret's value, or ask the user for a passphrase in the chat.
-- If `osss` isn't installed, tell the user and point them to https://keyburn.dev/agents. Don't install it without the user's approval.
+**1. Install it** (skip this if `~/.osss/osss.mjs` exists). The command checks the file's SHA-256 fingerprint and installs nothing if it doesn't match:
+
+```sh
+(umask 077 && mkdir -p ~/.osss && cd ~/.osss && rm -f osss.download \
+  && curl -fsSL -o osss.download https://keyburn.dev/cli/osss-1.1.0.mjs \
+  && echo "d5b88d304a32b2d5cfc604ad49e1b60b4fc420cd1162e7f475238b9fc85c8425  osss.download" | shasum -a 256 -c \
+  && mv osss.download osss.mjs)
+```
+
+On Linux without `shasum`, use `sha256sum -c` instead.
+
+**2. Open the link.** Give it the whole link, including everything after `#`, on standard input:
+
+```sh
+printf '%s\n' '<the full link>' | node ~/.osss/osss.mjs open -
+```
+
+Opening uses one of the link's views. osss prints a handle (`osss_…`) and what the secret holds (environment variable names, text or a file), never the value.
+
+**3. Use the secret** by running the command that needs it through osss:
+
+```sh
+node ~/.osss/osss.mjs run <handle> -- <command> [args…]
+```
+
+`NAME=value` lines become environment variables with those names, any other text is in `OSSS_SECRET`, and an attached file's path is in `OSSS_SECRET_FILE`. Values are redacted from the command's output.
+
+Rules:
+
+- Don't print, quote or summarise the value, and don't paste the link into other tools or services.
+- Open the link once. Trying again would use another view.
+- If osss says the secret needs a passphrase, ask the person to run step 2 in their own terminal. Never ask for a passphrase in the chat.
+- If the person wants to see the value, they can run `node ~/.osss/osss.mjs reveal <handle>` in their own terminal.
+- When you're done, run `node ~/.osss/osss.mjs forget <handle>`.
+
+## People: open it in a browser
+
+Open the full link in a web browser. The secret is decrypted on your device.
+
+More: [osss, its MCP server and the Claude Code hook](https://keyburn.dev/agents.md) · [How KeyBurn works](https://keyburn.dev/security.md)
