@@ -25,7 +25,7 @@ const pageCsp = (origin: string): string[] => [
   `font-src ${origin}/assets/fonts/`,
   `connect-src ${origin}/api/v1/`,
   "manifest-src 'none'",
-  "media-src 'none'",
+  `media-src ${origin}/assets/brand/`,
   "object-src 'none'",
   "frame-src 'none'",
   "child-src 'none'",

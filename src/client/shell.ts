@@ -13,6 +13,22 @@ import { initOpenLink } from "./open-link";
 import { initPills } from "./pills";
 import { receiptPips } from "./receipt-pips";
 
+/**
+ * The logo's entrance plays on the first page of a visit only (remembered for this tab in
+ * sessionStorage, which never leaves the browser); after that it simply shows the logo.
+ */
+function brandIntro(): void {
+  if (prefersReducedMotion()) return;
+  let seen = false;
+  try {
+    seen = sessionStorage.getItem("kb-intro") === "1";
+    sessionStorage.setItem("kb-intro", "1");
+  } catch {
+    // storage unavailable: play it every time
+  }
+  if (!seen) document.documentElement.classList.add("kb-intro");
+}
+
 /** Shows the real host in illustrations such as the terminal on the homepage. */
 function hostLabels(): void {
   if (!location.host) return;
@@ -135,6 +151,7 @@ export function initShell(): void {
   const root = document.documentElement;
   root.classList.remove("no-js");
   root.classList.add("js");
+  brandIntro();
   hostLabels();
   skipLinks();
   initOpenLink();

@@ -167,6 +167,9 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       ["/assets/brand/keyburn-mark.webp", "image/webp"],
       ["/assets/brand/favicon-32.png", "image/png"],
       ["/assets/brand/apple-touch-icon.png", "image/png"],
+      ["/assets/brand/fire.mp4", "video/mp4"],
+      ["/assets/brand/fire.webm", "video/webm"],
+      ["/assets/brand/burn-mask.svg", "image/svg+xml"],
     ]) {
       const res = await fetchPage(`https://secret.onesmartsheep.com${path}`);
       expect(res.status, path).toBe(200);
@@ -174,7 +177,18 @@ describe.skipIf(!("ASSETS" in env))("pages", () => {
       expectHardened(res.headers);
       await res.arrayBuffer();
     }
+    const range = await fetchPage("https://secret.onesmartsheep.com/assets/brand/fire.mp4", { headers: { range: "bytes=0-99" } });
+    expect(range.status).toBe(206);
+    expect(range.headers.get("content-range")).toMatch(/^bytes 0-99\//);
+    expect((await range.arrayBuffer()).byteLength).toBe(100);
+    const tail = await fetchPage("https://secret.onesmartsheep.com/assets/brand/fire.mp4", { headers: { range: "bytes=-10" } });
+    expect(tail.status).toBe(206);
+    expect((await tail.arrayBuffer()).byteLength).toBe(10);
+    const beyond = await fetchPage("https://secret.onesmartsheep.com/assets/brand/fire.mp4", { headers: { range: "bytes=99999999-" } });
+    expect(beyond.status).toBe(416);
+    await beyond.arrayBuffer();
     const page = await fetchPage("https://secret.onesmartsheep.com/");
+    expect(page.headers.get("content-security-policy")).toContain("media-src https://secret.onesmartsheep.com/assets/brand/;");
     expect(page.headers.get("content-security-policy")).toContain("img-src https://secret.onesmartsheep.com/assets/logo.svg https://secret.onesmartsheep.com/favicon.svg https://secret.onesmartsheep.com/assets/brand/;");
     await page.arrayBuffer();
   });

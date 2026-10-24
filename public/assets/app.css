@@ -358,29 +358,128 @@ main:focus-visible {
   transform: rotate(-6deg) scale(1.04);
 }
 
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
+/* ---- The KeyBurn wordmark: vector letters (Poppins Bold), "Burn" filled with live fire ---- */
+
+.wordmark-wrap {
+  position: relative;
+  display: block;
+  flex: none;
 }
 
-.brand-name {
-  color: var(--brand);
-  font-size: clamp(16px, 1.5vw, 20px);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
+.wordmark {
+  display: block;
+  height: clamp(22px, 2vw, 27px);
+  width: auto;
+  overflow: visible;
 }
 
-.brand-tag {
-  align-self: flex-start;
-  padding: 2px 7px;
-  border-radius: 7px;
-  background: var(--accent-soft);
-  color: var(--brand);
-  font: 500 10.5px/1.5 var(--mono);
+/* Grok's fire loop, shaped by the "Burn" letters: positioned on their box in the wordmark's
+   viewBox (x 1990-4350 and y -760-40 of 40..4350 by -730..280). */
+.wm-fire {
+  position: absolute;
+  left: 45.244%;
+  top: -2.97%;
+  width: 54.756%;
+  height: 79.208%;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-mask: url("/assets/brand/burn-mask.svg") 0 0 / 100% 100% no-repeat;
+  mask: url("/assets/brand/burn-mask.svg") 0 0 / 100% 100% no-repeat;
+}
+
+.wm-key {
+  fill: #1f5fcb;
+}
+
+.wm-burn {
+  fill: url(#kb-burn-grad);
+}
+
+.wm-l {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+/* Embers drift up from "Burn" and fade, always moving. */
+.wm-ember {
+  fill: #ffb547;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wm-ember 2.6s ease-out infinite;
+}
+
+.wm-e2 { fill: #ff8a3d; animation-delay: 0.5s; }
+.wm-e3 { animation-delay: 1.1s; }
+.wm-e4 { fill: #ff8a3d; animation-delay: 1.6s; }
+.wm-e5 { animation-delay: 2.1s; }
+
+.brand:hover .wm-ember {
+  animation-duration: 1.4s;
+}
+
+@keyframes wm-ember {
+  0% { opacity: 0; transform: translate(0, 0) scale(1); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-60px, -520px) scale(0.3); }
+}
+
+/* First visit in a tab: the icon pops in, the letters rise one by one, then the fire catches. */
+.kb-intro .brand-mark {
+  animation: wm-pop 0.8s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+.kb-intro .wm-l {
+  animation: wm-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.kb-intro .wm-l1 { animation-delay: 0.12s; }
+.kb-intro .wm-l2 { animation-delay: 0.19s; }
+.kb-intro .wm-l3 { animation-delay: 0.26s; }
+.kb-intro .wm-l4 { animation-delay: 0.36s; }
+.kb-intro .wm-l5 { animation-delay: 0.43s; }
+.kb-intro .wm-l6 { animation-delay: 0.5s; }
+.kb-intro .wm-l7 { animation-delay: 0.57s; }
+
+/* The fire catches from the B to the n once the letters have landed. */
+.kb-intro .wm-fire {
+  animation: wm-catch 0.9s ease-out 0.78s both;
+}
+
+@keyframes wm-catch {
+  0% { clip-path: inset(0 100% 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+.kb-intro .wm-embers {
+  animation: wm-ignite 0.6s ease-out 1.3s both;
+}
+
+@keyframes wm-pop {
+  0% { opacity: 0; transform: scale(0.55) rotate(-14deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes wm-rise {
+  0% { opacity: 0; transform: translateY(45%); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes wm-ignite {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-fire,
+  .wm-embers {
+    display: none;
+  }
+
+  .kb-intro .brand-mark,
+  .kb-intro .wm-l {
+    animation: none;
+  }
 }
 
 .bar {
@@ -4920,6 +5019,10 @@ pre.code code {
     width: 36px;
     height: 36px;
     border-radius: 11px;
+  }
+
+  .wordmark {
+    height: 22px;
   }
 
   .star-text {
