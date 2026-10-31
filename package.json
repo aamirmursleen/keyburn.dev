@@ -22,15 +22,15 @@
     "build:verify": "node scripts/build.mjs --verify-release"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "1.4.7",
-    "@types/node": "22.20.5",
+    "@cloudflare/vitest-plugin": "1.4.9",
+    "@types/node": "26.6.5",
     "@vitest/coverage-istanbul": "5.0.5",
     "axe-core": "4.14.0",
     "esbuild": "0.28.2",
-    "playwright": "1.63.0",
+    "playwright": "1.64.1",
     "typescript": "7.0.2",
     "vitest": "5.0.5",
-    "wrangler": "4.152.0"
+    "wrangler": "4.154.0"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,
